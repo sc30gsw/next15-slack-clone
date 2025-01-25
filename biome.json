@@ -37,8 +37,7 @@
 	"overrides": [
 		{
 			"include": [
-				"next.config.mjs",
-				"tailwind.config.ts",
+				"next.config.ts",
 				"layout.tsx",
 				"page.tsx",
 				"loading.tsx",
@@ -46,12 +45,27 @@
 				"not-found.tsx",
 				"middleware.ts",
 				"default.tsx",
-				"postcss.config.mjs"
+				"postcss.config.mjs",
+				"/src/components/justd/ui/index.ts"
 			],
 			"linter": {
 				"rules": {
 					"style": {
 						"noDefaultExport": "off"
+					}
+				}
+			}
+		},
+		{
+			"include": ["src/components/justd/ui/index.ts"],
+			"linter": {
+				"rules": {
+					"performance": {
+						"noBarrelFile": "off",
+						"noReExportAll": "off"
+					},
+					"correctness": {
+						"useImportExtensions": "off"
 					}
 				}
 			}
