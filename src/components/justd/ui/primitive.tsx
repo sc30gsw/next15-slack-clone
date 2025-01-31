@@ -32,7 +32,7 @@ const focusStyles = tv({
 })
 
 const focusButtonStyles = tv({
-	base: 'outline outline-ring outline-offset-2 forced-colors:outline-[Highlight]',
+	base: 'outline outline-ring outline-offset-2] forced-colors:outline-[Highlight',
 	variants: {
 		isFocusVisible: {
 			false: 'outline-0',

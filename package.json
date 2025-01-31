@@ -11,12 +11,16 @@
 		"check:biome": "biome check --apply ./src"
 	},
 	"dependencies": {
+		"@conform-to/react": "^1.2.2",
+		"@conform-to/zod": "^1.2.2",
 		"@tailwindcss/postcss": "^4.0.0",
+		"babel-plugin-react-compiler": "^19.0.0-beta-decd7b8-20250118",
 		"justd-icons": "^1.10.24",
 		"next": "15.1.6",
 		"react": "^19.0.0",
 		"react-aria-components": "^1.6.0",
-		"react-dom": "^19.0.0"
+		"react-dom": "^19.0.0",
+		"zod": "^3.24.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
