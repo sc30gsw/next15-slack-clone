@@ -13,8 +13,11 @@
 	"dependencies": {
 		"@conform-to/react": "^1.2.2",
 		"@conform-to/zod": "^1.2.2",
+		"@t3-oss/env-nextjs": "^0.12.0",
 		"@tailwindcss/postcss": "^4.0.0",
 		"babel-plugin-react-compiler": "^19.0.0-beta-decd7b8-20250118",
+		"convex": "^1.18.2",
+		"hono": "^4.6.20",
 		"justd-icons": "^1.10.24",
 		"next": "15.1.6",
 		"react": "^19.0.0",
