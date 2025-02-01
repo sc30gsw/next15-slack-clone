@@ -46,7 +46,8 @@
 				"middleware.ts",
 				"default.tsx",
 				"postcss.config.mjs",
-				"/src/components/justd/ui/index.ts"
+				"/src/components/justd/ui/index.ts",
+				"route.ts"
 			],
 			"linter": {
 				"rules": {
@@ -76,6 +77,36 @@
 				"rules": {
 					"a11y": {
 						"noSvgWithoutTitle": "off"
+					}
+				}
+			}
+		},
+		{
+			"include": ["convex/_generated/*.ts"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noExplicitAny": "off"
+					}
+				}
+			}
+		},
+		{
+			"include": ["convex/*.ts", "route.ts"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"useImportExtensions": "off"
+					}
+				}
+			}
+		},
+		{
+			"include": ["src/env.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useNamingConvention": "off"
 					}
 				}
 			}
