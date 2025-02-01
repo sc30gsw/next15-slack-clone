@@ -47,7 +47,8 @@
 				"default.tsx",
 				"postcss.config.mjs",
 				"/src/components/justd/ui/index.ts",
-				"route.ts"
+				"route.ts",
+				"drizzle.config.ts"
 			],
 			"linter": {
 				"rules": {

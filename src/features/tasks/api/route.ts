@@ -1,9 +1,8 @@
-import { fetchQuery } from 'convex/nextjs'
+import { db } from '@/db/db'
 import { Hono } from 'hono'
-import { api } from '../../../../convex/_generated/api'
 
 const app = new Hono().get('/', async (c) => {
-	const tasks = await fetchQuery(api.tasks.get)
+	const tasks = await db.query.tasksTable.findMany()
 
 	return c.json(tasks)
 })
