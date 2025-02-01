@@ -1,5 +1,6 @@
 'use client'
 
+import { ConvexClientProvider } from '@/components/providers/convex-client-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import type { Route } from 'next'
 import type { NavigateOptions } from 'next/dist/shared/lib/app-router-context.shared-runtime'
@@ -25,7 +26,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 	return (
 		<RouterProvider navigate={navigate}>
 			<ThemeProvider enableSystem={true} attribute="class">
-				{children}
+				<ConvexClientProvider>{children}</ConvexClientProvider>
 			</ThemeProvider>
 		</RouterProvider>
 	)
