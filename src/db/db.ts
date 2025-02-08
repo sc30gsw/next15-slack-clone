@@ -1,10 +1,7 @@
 // biome-ignore lint/style/noNamespaceImport: <explanation>
 import * as schema from '@/db/schema'
 import { env } from '@/env'
-import { config } from 'dotenv'
 import { drizzle } from 'drizzle-orm/libsql'
-
-config({ path: '.env.local' })
 
 export const db = drizzle({
 	connection: {

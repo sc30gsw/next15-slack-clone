@@ -8,6 +8,34 @@
       "when": 1738375984276,
       "tag": "0000_opposite_hitman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1738971197874,
+      "tag": "0001_fuzzy_yellow_claw",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1738971679423,
+      "tag": "0002_cooing_power_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1738971960634,
+      "tag": "0003_amused_zzzax",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1738973983266,
+      "tag": "0004_slippery_naoko",
+      "breakpoints": true
     }
   ]
 }
