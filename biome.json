@@ -103,7 +103,11 @@
 			}
 		},
 		{
-			"include": ["src/env.ts"],
+			"include": [
+				"src/env.ts",
+				"schema.ts",
+				"./src/features/**/types/schemas/*.ts"
+			],
 			"linter": {
 				"rules": {
 					"style": {
