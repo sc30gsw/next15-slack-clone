@@ -1,8 +1,9 @@
-import { Button } from '@/components/justd/ui'
+import { Button, Loader } from '@/components/justd/ui'
 import type { FC, SVGProps } from 'react'
 
 type OauthButtonProps = {
 	isDisabled: boolean
+	isPending: boolean
 	onClick: () => void
 	icon: FC<SVGProps<SVGSVGElement>>
 	label: string
@@ -10,13 +11,14 @@ type OauthButtonProps = {
 
 export const OauthButton = ({
 	isDisabled,
+	isPending,
 	onClick,
 	icon: Icon,
 	label,
 }: OauthButtonProps) => {
 	return (
 		<Button
-			isDisabled={isDisabled}
+			isDisabled={isDisabled || isPending}
 			appearance="outline"
 			size="large"
 			onPress={onClick}
@@ -24,6 +26,9 @@ export const OauthButton = ({
 		>
 			<Icon className="size-5 absolute top-1.5 left-2.5" />
 			{label}
+			{!isPending && isDisabled && (
+				<Loader className="absolute right-2.5 top-3" />
+			)}
 		</Button>
 	)
 }

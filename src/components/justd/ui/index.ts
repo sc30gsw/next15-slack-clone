@@ -1,5 +1,6 @@
 export * from './primitive';
 export * from './button'
+export * from './button';
 export * from './card';
 export * from './field';
 export * from './form';
@@ -8,3 +9,4 @@ export * from './loader';
 export * from './primitive'
 export * from './separator';
 export * from './text-field';
+export * from './toast';
