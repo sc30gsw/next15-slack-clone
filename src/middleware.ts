@@ -1,15 +1,15 @@
-import { getSession } from '@/lib/auth/session'
-import { type NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import { NextResponse } from 'next/server'
 
-export const middleware = async (req: NextRequest) => {
-	const session = await getSession()
+export default auth((req) => {
+	const isLoggedIn = !!req.auth
 
-	if (session) {
-		return NextResponse.next()
+	if (!(isLoggedIn || req.nextUrl.pathname.includes('/api/auth/callback'))) {
+		return NextResponse.redirect(new URL('/sign-in', req.nextUrl))
 	}
 
-	return NextResponse.redirect(`${req.nextUrl.origin}/sign-in`)
-}
+	return NextResponse.next()
+})
 
 export const config = {
 	matcher: [
@@ -19,6 +19,3 @@ export const config = {
 		'/(api|trpc)(.*)',
 	],
 }
-
-// biome-ignore lint/performance/noBarrelFile: This is a barrel file
-export { auth as authMiddleware } from '@/auth'
