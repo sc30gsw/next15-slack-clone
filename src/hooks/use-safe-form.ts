@@ -2,7 +2,7 @@ import { useForm } from '@conform-to/react'
 
 // biome-ignore lint/suspicious/noExplicitAny: This is a type definition in conform
 type FieldValues<T extends Record<string, any>> = Parameters<
-	typeof useForm<T>
+  typeof useForm<T>
 >[0]
 
 /**
@@ -11,6 +11,6 @@ type FieldValues<T extends Record<string, any>> = Parameters<
  */
 // biome-ignore lint/suspicious/noExplicitAny: This is a type definition in conform
 export const useSafeForm = <T extends Record<string, any>>(
-	options: Omit<FieldValues<T>, 'defaultValue'> &
-		Required<Pick<FieldValues<T>, 'defaultValue'>>,
+  options: Omit<FieldValues<T>, 'defaultValue'> &
+    Required<Pick<FieldValues<T>, 'defaultValue'>>,
 ): ReturnType<typeof useForm<T>> => useForm<T>(options)

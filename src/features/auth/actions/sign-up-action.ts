@@ -9,39 +9,39 @@ import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 
 export const signUpAction = async (_: unknown, formData: FormData) => {
-	const submission = parseWithZod(formData, { schema: signUpInputSchema })
+  const submission = parseWithZod(formData, { schema: signUpInputSchema })
 
-	if (submission.status !== 'success') {
-		return submission.reply()
-	}
+  if (submission.status !== 'success') {
+    return submission.reply()
+  }
 
-	const existingUser = await db.query.users.findFirst({
-		where: eq(users.email, submission.value.email),
-	})
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.email, submission.value.email),
+  })
 
-	if (existingUser) {
-		return submission.reply({
-			fieldErrors: { message: ['Email already in use'] },
-		})
-	}
+  if (existingUser) {
+    return submission.reply({
+      fieldErrors: { message: ['Email already in use'] },
+    })
+  }
 
-	const hashedPassword = await bcrypt.hash(submission.value.password, 10)
+  const hashedPassword = await bcrypt.hash(submission.value.password, 10)
 
-	const [newUser] = await db
-		.insert(users)
-		.values({
-			email: submission.value.email,
-			hashedPassword,
-			image: '',
-		})
-		.returning()
+  const [newUser] = await db
+    .insert(users)
+    .values({
+      email: submission.value.email,
+      hashedPassword,
+      image: '',
+    })
+    .returning()
 
-	await signIn('credentials', {
-		email: newUser.email,
-		password: submission.value.password,
-		redirect: true,
-		redirectTo: '/',
-	})
+  await signIn('credentials', {
+    email: newUser.email,
+    password: submission.value.password,
+    redirect: true,
+    redirectTo: '/',
+  })
 
-	return submission.reply()
+  return submission.reply()
 }

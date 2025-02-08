@@ -8,25 +8,25 @@ import type { ReactNode } from 'react'
 import { RouterProvider } from 'react-aria-components'
 
 declare module 'react-aria-components' {
-	interface RouterConfig {
-		routerOptions: NonNullable<
-			Parameters<ReturnType<typeof useRouter>['push']>[1]
-		>
-	}
+  interface RouterConfig {
+    routerOptions: NonNullable<
+      Parameters<ReturnType<typeof useRouter>['push']>[1]
+    >
+  }
 }
 
 export const Providers = ({ children }: { children: ReactNode }) => {
-	const router = useRouter()
+  const router = useRouter()
 
-	const navigate = (path: string, routerOptions?: NavigateOptions) => {
-		router.push(path as Route<string>, routerOptions)
-	}
+  const navigate = (path: string, routerOptions?: NavigateOptions) => {
+    router.push(path as Route<string>, routerOptions)
+  }
 
-	return (
-		<RouterProvider navigate={navigate}>
-			<ThemeProvider enableSystem={true} attribute="class">
-				{children}
-			</ThemeProvider>
-		</RouterProvider>
-	)
+  return (
+    <RouterProvider navigate={navigate}>
+      <ThemeProvider enableSystem={true} attribute="class">
+        {children}
+      </ThemeProvider>
+    </RouterProvider>
+  )
 }

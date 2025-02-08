@@ -10,114 +10,114 @@ import GitHub from 'next-auth/providers/github'
 import Google from 'next-auth/providers/google'
 
 export const config = {
-	adapter: DrizzleAdapter(db, {
-		usersTable: users,
-		accountsTable: accounts,
-		sessionsTable: sessions,
-	}),
-	callbacks: {
-		async signIn({ user, account }) {
-			if (account?.provider === 'github' || account?.provider === 'google') {
-				return true
-			}
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+  }),
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'github' || account?.provider === 'google') {
+        return true
+      }
 
-			if (!user.id) {
-				return false
-			}
+      if (!user.id) {
+        return false
+      }
 
-			const existingUser = await db.query.users.findFirst({
-				where: eq(users.id, user.id),
-			})
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+      })
 
-			if (!existingUser) {
-				return false
-			}
+      if (!existingUser) {
+        return false
+      }
 
-			return true
-		},
+      return true
+    },
 
-		session({ session, token }) {
-			if (token.sub) {
-				session.user.id = token.sub
-			}
+    session({ session, token }) {
+      if (token.sub) {
+        session.user.id = token.sub
+      }
 
-			return session
-		},
+      return session
+    },
 
-		async jwt({ token }) {
-			if (!token.sub) {
-				return token
-			}
+    async jwt({ token }) {
+      if (!token.sub) {
+        return token
+      }
 
-			const existingUser = await db.query.users.findFirst({
-				where: eq(users.id, token.sub),
-			})
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.id, token.sub),
+      })
 
-			if (!existingUser) {
-				return token
-			}
+      if (!existingUser) {
+        return token
+      }
 
-			token.name = existingUser.name
-			token.email = existingUser.email
-			token.image = existingUser.image
+      token.name = existingUser.name
+      token.email = existingUser.email
+      token.image = existingUser.image
 
-			return token
-		},
-	},
-	providers: [
-		GitHub({
-			clientId: env.GITHUB_CLIENT_ID,
-			clientSecret: env.GITHUB_CLIENT_SECRET,
-		}),
-		Google({
-			clientId: env.GOOGLE_CLIENT_ID,
-			clientSecret: env.GOOGLE_CLIENT_SECRET,
-		}),
-		Credentials({
-			credentials: {
-				email: { label: 'Email', type: 'email' },
-				password: { label: 'Password', type: 'password' },
-			},
-			authorize: async (credentials) => {
-				if (
-					!(
-						typeof credentials?.email === 'string' &&
-						typeof credentials?.password === 'string'
-					)
-				) {
-					throw new Error('Invalid credentials.')
-				}
+      return token
+    },
+  },
+  providers: [
+    GitHub({
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
+    }),
+    Google({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    }),
+    Credentials({
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      authorize: async (credentials) => {
+        if (
+          !(
+            typeof credentials?.email === 'string' &&
+            typeof credentials?.password === 'string'
+          )
+        ) {
+          throw new Error('Invalid credentials.')
+        }
 
-				const user = await db.query.users.findFirst({
-					where: eq(users.email, credentials.email),
-				})
+        const user = await db.query.users.findFirst({
+          where: eq(users.email, credentials.email),
+        })
 
-				if (!user?.hashedPassword) {
-					throw new Error('User has no password')
-				}
+        if (!user?.hashedPassword) {
+          throw new Error('User has no password')
+        }
 
-				const isCorrectPassword = await bcrypt.compare(
-					credentials.password,
-					user.hashedPassword,
-				)
+        const isCorrectPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword,
+        )
 
-				if (!isCorrectPassword) {
-					throw new Error('Incorrect password')
-				}
+        if (!isCorrectPassword) {
+          throw new Error('Incorrect password')
+        }
 
-				return {
-					id: user.id,
-					name: user.name,
-					email: user.email,
-				}
-			},
-		}),
-	],
-	pages: {
-		signIn: '/sign-in',
-	},
-	trustHost: true,
-	debug: process.env.NODE_ENV === 'development',
-	session: { strategy: 'jwt' },
-	secret: env.AUTH_SECRET,
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        }
+      },
+    }),
+  ],
+  pages: {
+    signIn: '/sign-in',
+  },
+  trustHost: true,
+  debug: process.env.NODE_ENV === 'development',
+  session: { strategy: 'jwt' },
+  secret: env.AUTH_SECRET,
 } as const satisfies NextAuthConfig
