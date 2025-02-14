@@ -30,7 +30,7 @@ export const users = sqliteTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    name: text('name'),
+    name: text('name').unique(),
     email: text('email').unique(),
     emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
     hashedPassword: text('hashedPassword'),
@@ -40,7 +40,10 @@ export const users = sqliteTable(
       () => new Date(),
     ),
   },
-  (user) => [uniqueIndex('email').on(user.email)],
+  (user) => [
+    uniqueIndex('email').on(user.email),
+    uniqueIndex('name').on(user.name),
+  ],
 )
 
 export type InsertUser = typeof users.$inferInsert
