@@ -17,7 +17,7 @@ export const UserButton = () => {
   const { resolvedTheme, setTheme } = useTheme()
   const { data: session, status } = useSession()
 
-  if (status === 'loading') {
+  if (status === 'loading' || !session) {
     return (
       <Menu>
         <Menu.Trigger>
@@ -31,10 +31,10 @@ export const UserButton = () => {
     <Menu>
       <Menu.Trigger aria-label="Open Menu" className="outline-none relative">
         <Avatar
-          alt={session?.user?.name ?? 'User'}
+          alt={session.user?.name ?? 'User'}
           size="large"
-          src={session?.user?.image}
-          initials={session?.user?.name?.charAt(0).toUpperCase()}
+          src={session.user?.image}
+          initials={session.user?.name?.charAt(0).toUpperCase()}
           className="hover:opacity-75 transition cursor-pointer bg-sky-500 text-white"
         />
       </Menu.Trigger>
