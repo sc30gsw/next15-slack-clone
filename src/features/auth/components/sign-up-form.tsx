@@ -22,13 +22,21 @@ export const SignUpForm = () => {
   const { form, action, lastResult, isPending, fields } = useSignUp()
   const { isPending: isOauthPending, action: oauthAction } = useOauthSignIn()
 
+  const getError = () => {
+    if (lastResult?.error && Array.isArray(lastResult.error.message)) {
+      return lastResult.error.message.join(', ')
+    }
+
+    return
+  }
+
   return (
     <>
       <Form {...getFormProps(form)} action={action} className="space-y-2.5">
-        {lastResult?.error && Array.isArray(lastResult.error.message) && (
+        {getError() && (
           <div className="bg-danger/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-danger mb-6">
             <IconTriangleExclamation className="size-4" />
-            <p>{lastResult.error.message.join(', ')}</p>
+            <p>{getError()}</p>
           </div>
         )}
 

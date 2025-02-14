@@ -11,16 +11,34 @@ import { OauthButton } from '@/features/auth/components/oauth-button'
 import { useOauthSignIn } from '@/features/auth/hooks/use-oauth-sign-in'
 import { useSignIn } from '@/features/auth/hooks/use-sign-in'
 import { getFormProps, getInputProps } from '@conform-to/react'
-import { IconBrandGithub, IconBrandGoogle } from 'justd-icons'
+import {
+  IconBrandGithub,
+  IconBrandGoogle,
+  IconTriangleExclamation,
+} from 'justd-icons'
 import { Fragment } from 'react'
 
 export const SignInForm = () => {
   const { form, action, fields, lastResult, isPending } = useSignIn()
   const { isPending: isOauthPending, action: oauthAction } = useOauthSignIn()
 
+  const getError = () => {
+    if (lastResult?.error && Array.isArray(lastResult.error.message)) {
+      return lastResult.error.message.join(', ')
+    }
+
+    return
+  }
+
   return (
     <>
       <Form {...getFormProps(form)} action={action} className="space-y-2.5">
+        {getError() && (
+          <div className="bg-danger/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-danger mb-6">
+            <IconTriangleExclamation className="size-4" />
+            <p>{getError()}</p>
+          </div>
+        )}
         <div>
           <TextField
             {...getInputProps(fields.email, { type: 'email' })}

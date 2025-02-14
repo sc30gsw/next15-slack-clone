@@ -7,6 +7,7 @@ import { signUpInputSchema } from '@/features/auth/types/schemas/sign-up-input-s
 import { parseWithZod } from '@conform-to/zod'
 import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
+import { AuthError } from 'next-auth'
 
 export const signUpAction = async (_: unknown, formData: FormData) => {
   const submission = parseWithZod(formData, { schema: signUpInputSchema })
@@ -15,33 +16,49 @@ export const signUpAction = async (_: unknown, formData: FormData) => {
     return submission.reply()
   }
 
-  const existingUser = await db.query.users.findFirst({
-    where: eq(users.email, submission.value.email),
-  })
+  try {
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, submission.value.email),
+    })
 
-  if (existingUser) {
+    if (existingUser) {
+      return submission.reply({
+        fieldErrors: { message: ['Email already in use'] },
+      })
+    }
+
+    const hashedPassword = await bcrypt.hash(submission.value.password, 10)
+
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email: submission.value.email,
+        hashedPassword,
+        image: '',
+      })
+      .returning()
+
+    await signIn('credentials', {
+      email: newUser.email,
+      password: submission.value.password,
+      redirect: true,
+      redirectTo: '/',
+    })
+
+    return submission.reply()
+  } catch (err) {
+    if (err instanceof AuthError) {
+      return submission.reply({
+        fieldErrors: {
+          message: [err.cause?.err?.message ?? 'Something went wrong'],
+        },
+      })
+    }
+
     return submission.reply({
-      fieldErrors: { message: ['Email already in use'] },
+      fieldErrors: {
+        message: ['Something went wrong'],
+      },
     })
   }
-
-  const hashedPassword = await bcrypt.hash(submission.value.password, 10)
-
-  const [newUser] = await db
-    .insert(users)
-    .values({
-      email: submission.value.email,
-      hashedPassword,
-      image: '',
-    })
-    .returning()
-
-  await signIn('credentials', {
-    email: newUser.email,
-    password: submission.value.password,
-    redirect: true,
-    redirectTo: '/',
-  })
-
-  return submission.reply()
 }
