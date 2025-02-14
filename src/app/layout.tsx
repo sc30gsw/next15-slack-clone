@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Toast } from '@/components/justd/ui'
+import { Providers } from '@/components/providers/providers'
 import type { ReactNode } from 'react'
 
 const geistSans = Geist({
@@ -35,8 +36,10 @@ const RootLayout = ({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toast />
-        {children}
+        <Providers>
+          <Toast />
+          {children}
+        </Providers>
       </body>
     </html>
   )

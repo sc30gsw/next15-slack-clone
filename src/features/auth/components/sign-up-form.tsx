@@ -22,16 +22,36 @@ export const SignUpForm = () => {
   const { form, action, lastResult, isPending, fields } = useSignUp()
   const { isPending: isOauthPending, action: oauthAction } = useOauthSignIn()
 
+  const getError = () => {
+    if (lastResult?.error && Array.isArray(lastResult.error.message)) {
+      return lastResult.error.message.join(', ')
+    }
+
+    return
+  }
+
   return (
     <>
       <Form {...getFormProps(form)} action={action} className="space-y-2.5">
-        {lastResult?.error && Array.isArray(lastResult.error.message) && (
+        {getError() && (
           <div className="bg-danger/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-danger mb-6">
             <IconTriangleExclamation className="size-4" />
-            <p>{lastResult.error.message.join(', ')}</p>
+            <p>{getError()}</p>
           </div>
         )}
 
+        <div>
+          <TextField
+            {...getInputProps(fields.name, { type: 'text' })}
+            placeholder="Full name"
+            defaultValue={lastResult?.initialValue?.name.toString() ?? ''}
+            isDisabled={isPending || isOauthPending}
+            errorMessage={''}
+          />
+          <span id={fields.name.errorId} className="text-sm text-red-500">
+            {fields.name.errors}
+          </span>
+        </div>
         <div>
           <TextField
             {...getInputProps(fields.email, { type: 'email' })}
@@ -55,7 +75,7 @@ export const SignUpForm = () => {
           <span id={fields.password.errorId} className="text-sm text-red-500">
             {fields.password.errors && fields.password.errors?.length > 1
               ? fields.password.errors.map((error) => (
-                  <Fragment key={error}>
+                  <Fragment key={crypto.randomUUID()}>
                     {error}
                     <br />
                   </Fragment>

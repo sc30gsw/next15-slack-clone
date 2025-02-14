@@ -36,6 +36,13 @@
       "when": 1738973983266,
       "tag": "0004_slippery_naoko",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1739569144495,
+      "tag": "0005_special_giant_man",
+      "breakpoints": true
     }
   ]
 }

@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import type { Route } from 'next'
+import { SessionProvider } from 'next-auth/react'
 import type { NavigateOptions } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -25,7 +26,7 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <RouterProvider navigate={navigate}>
       <ThemeProvider enableSystem={true} attribute="class">
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </ThemeProvider>
     </RouterProvider>
   )
