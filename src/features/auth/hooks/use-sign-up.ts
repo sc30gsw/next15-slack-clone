@@ -17,6 +17,7 @@ export const useSignUp = () => {
       return parseWithZod(formData, { schema: signUpInputSchema })
     },
     defaultValue: {
+      name: '',
       email: '',
       password: '',
       passwordConfirmation: '',

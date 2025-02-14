@@ -5,6 +5,9 @@ const numberRegex = /[0-9]/
 
 export const signUpInputSchema = z
   .object({
+    name: z
+      .string({ required_error: 'Name is required' })
+      .max(128, { message: 'Name is too long' }),
     email: z
       .string({ required_error: 'Email is required' })
       .email()

@@ -42,6 +42,18 @@ export const SignUpForm = () => {
 
         <div>
           <TextField
+            {...getInputProps(fields.name, { type: 'text' })}
+            placeholder="Full name"
+            defaultValue={lastResult?.initialValue?.name.toString() ?? ''}
+            isDisabled={isPending || isOauthPending}
+            errorMessage={''}
+          />
+          <span id={fields.name.errorId} className="text-sm text-red-500">
+            {fields.name.errors}
+          </span>
+        </div>
+        <div>
+          <TextField
             {...getInputProps(fields.email, { type: 'email' })}
             placeholder="Email"
             defaultValue={lastResult?.initialValue?.email.toString() ?? ''}
@@ -63,7 +75,7 @@ export const SignUpForm = () => {
           <span id={fields.password.errorId} className="text-sm text-red-500">
             {fields.password.errors && fields.password.errors?.length > 1
               ? fields.password.errors.map((error) => (
-                  <Fragment key={error}>
+                  <Fragment key={crypto.randomUUID()}>
                     {error}
                     <br />
                   </Fragment>
