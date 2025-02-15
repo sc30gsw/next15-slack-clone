@@ -17,33 +17,33 @@ export const signUpAction = async (_: unknown, formData: FormData) => {
     return submission.reply()
   }
 
-  const existingUser = await db.query.users.findFirst({
-    where: or(
-      eq(users.email, submission.value.email),
-      eq(users.name, submission.value.name),
-    ),
-  })
-
-  if (existingUser) {
-    return submission.reply({
-      fieldErrors: { message: ['Email or Name already in use'] },
-    })
-  }
-
-  const hashedPassword = await bcrypt.hash(submission.value.password, 10)
-
-  const [newUser] = await db
-    .insert(users)
-    .values({
-      name: submission.value.name,
-      email: submission.value.email,
-      hashedPassword,
-      image: '',
-    })
-    .returning()
-
   try {
-    await signIn('credentials', {
+    const existingUser = await db.query.users.findFirst({
+      where: or(
+        eq(users.email, submission.value.email),
+        eq(users.name, submission.value.name),
+      ),
+    })
+
+    if (existingUser) {
+      return submission.reply({
+        fieldErrors: { message: ['Email or Name already in use'] },
+      })
+    }
+
+    const hashedPassword = await bcrypt.hash(submission.value.password, 10)
+
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        name: submission.value.name,
+        email: submission.value.email,
+        hashedPassword,
+        image: '',
+      })
+      .returning()
+
+    return await signIn('credentials', {
       email: newUser.email,
       password: submission.value.password,
       redirect: true,
