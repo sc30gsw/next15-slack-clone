@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import {
   index,
   integer,
@@ -30,6 +30,10 @@ export const users = sqliteTable(
     uniqueIndex('name').on(user.name),
   ],
 )
+
+export const usersRelations = relations(users, ({ many }) => ({
+  workspaces: many(workspaces),
+}))
 
 export type InsertUser = typeof users.$inferInsert
 export type SelectUser = typeof users.$inferSelect
@@ -86,3 +90,10 @@ export const workspaces = sqliteTable('workspaces', {
 
 export type InsertPost = typeof workspaces.$inferInsert
 export type SelectPost = typeof workspaces.$inferSelect
+
+export const workspacesRelations = relations(workspaces, ({ one }) => ({
+  user: one(users, {
+    fields: [workspaces.userId],
+    references: [users.id],
+  }),
+}))
