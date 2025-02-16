@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 export const env = createEnv({
   server: {
+    NODE_ENV: z.enum(['development', 'production']),
     TURSO_AUTH_TOKEN: z.string(),
     TURSO_CONNECTION_URL: z.string().url(),
     AUTH_SECRET: z.string(),
@@ -15,6 +16,7 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: z.string().url(),
   },
   runtimeEnv: {
+    NODE_ENV: process.env.NODE_ENV,
     TURSO_CONNECTION_URL: process.env.TURSO_CONNECTION_URL,
     TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
     AUTH_SECRET: process.env.AUTH_SECRET,
