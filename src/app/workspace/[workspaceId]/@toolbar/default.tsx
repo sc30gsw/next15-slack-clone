@@ -1,6 +1,6 @@
 import { Toolbar } from '@/features/workspaces/components/toolbar'
 
-const ToolbarDefault = async ({
+const WorkspaceIdToolbarDefault = async ({
   params,
 }: { params: Promise<{ workspaceId: string }> }) => {
   const { workspaceId } = await params
@@ -8,4 +8,4 @@ const ToolbarDefault = async ({
   return <Toolbar workspaceId={workspaceId} />
 }
 
-export default ToolbarDefault
+export default WorkspaceIdToolbarDefault
