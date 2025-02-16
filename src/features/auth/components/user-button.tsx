@@ -40,8 +40,10 @@ export const UserButton = () => {
       </Menu.Trigger>
       <Menu.Content placement="right" showArrow={true} className="w-60">
         <Menu.Header separator={true}>
-          <span className="block">Kurt Cobain</span>
-          <span className="font-normal text-muted-fg">@cobain</span>
+          <span className="block">{session.user?.name}</span>
+          <span className="font-normal text-muted-fg">
+            @{session.user?.id?.slice(0, 12)}
+          </span>
         </Menu.Header>
 
         <Menu.Section>
