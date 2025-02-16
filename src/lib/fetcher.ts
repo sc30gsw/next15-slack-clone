@@ -15,6 +15,10 @@ export const fetcher = async <T>(url: FetchArgs[0], args?: FetchArgs[1]) => {
       redirect('/sign-in')
       break
 
+    case 403:
+      redirect('/')
+      break
+
     default:
       break
   }
