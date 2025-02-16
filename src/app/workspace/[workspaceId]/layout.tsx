@@ -1,13 +1,19 @@
+import { CreateWorkSpaceModal } from '@/features/workspaces/components/crete-workspace-modal'
 import type { ReactNode } from 'react'
 
 const WorkspaceIdLayout = ({
   children,
   toolbar,
-}: { children: ReactNode; toolbar: ReactNode }) => {
+  sidebar,
+}: { children: ReactNode; toolbar: ReactNode; sidebar: ReactNode }) => {
   return (
     <div className="h-full">
       {toolbar}
-      {children}
+      <section className="flex h-[calc(100vh-40px)]">
+        {sidebar}
+        {children}
+      </section>
+      <CreateWorkSpaceModal />
     </div>
   )
 }

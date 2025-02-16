@@ -2,6 +2,7 @@
 
 import { Button, Form, Loader, Modal, TextField } from '@/components/justd/ui'
 import { createWorkspaceAction } from '@/features/workspaces/actions/create-workspace-action'
+import { useCreateWorkspaceModal } from '@/features/workspaces/hooks/use-create-workspace-modal'
 import {
   type CreateWorkspaceInput,
   createWorkspaceInputSchema,
@@ -42,8 +43,10 @@ export const CreateWorkSpaceModal = () => {
     },
   })
 
+  const [open, setOpen] = useCreateWorkspaceModal()
+
   return (
-    <Modal isOpen={true}>
+    <Modal isOpen={open} onOpenChange={setOpen}>
       <Modal.Content>
         <Modal.Header>
           <Modal.Title>Add a workspace</Modal.Title>
