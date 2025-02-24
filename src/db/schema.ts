@@ -33,6 +33,7 @@ export const users = sqliteTable(
 
 export const usersRelations = relations(users, ({ many }) => ({
   workspaces: many(workspaces),
+  members: many(members),
 }))
 
 export type InsertUser = typeof users.$inferInsert
@@ -57,43 +58,87 @@ export const accounts = sqliteTable(
   },
   (account) => [
     primaryKey({ columns: [account.provider, account.providerAccountId] }),
-    index('userId').on(account.userId),
+    uniqueIndex('account_userId').on(account.userId),
   ],
 )
 
 export type InsertAccount = typeof accounts.$inferInsert
 
-export const sessions = sqliteTable('session', {
-  sessionToken: text('sessionToken').primaryKey(),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
-})
+export const sessions = sqliteTable(
+  'session',
+  {
+    sessionToken: text('sessionToken').primaryKey(),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (session) => [index('session_userId').on(session.userId)],
+)
 
 export type InsertSession = typeof sessions.$inferInsert
 
-export const workspaces = sqliteTable('workspaces', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text('name').notNull(),
-  joinCode: text('join_code').notNull(),
-  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-  updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
-    () => new Date(),
-  ),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-})
+export const workspaces = sqliteTable(
+  'workspaces',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: text('name').notNull(),
+    joinCode: text('join_code').notNull(),
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+      () => new Date(),
+    ),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+  },
+  (workspace) => [index('workspace_userId').on(workspace.userId)],
+)
 
 export type InsertPost = typeof workspaces.$inferInsert
 export type SelectPost = typeof workspaces.$inferSelect
 
-export const workspacesRelations = relations(workspaces, ({ one }) => ({
+export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
   user: one(users, {
     fields: [workspaces.userId],
     references: [users.id],
+  }),
+  members: many(members),
+}))
+
+export const members = sqliteTable(
+  'members',
+  {
+    userId: text('userId').references(() => users.id, { onDelete: 'cascade' }),
+    workspaceId: text('workspaceId')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    role: text('role', { enum: ['admin', 'member'] }).notNull(),
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (members) => [
+    primaryKey({ columns: [members.userId, members.workspaceId] }),
+    index('member_userId').on(members.userId),
+    index('member_workspaceId').on(members.workspaceId),
+    uniqueIndex('workspaceId_userId').on(members.workspaceId, members.userId),
+  ],
+)
+
+export type InsertMember = typeof members.$inferInsert
+export type SelectMember = typeof members.$inferSelect
+
+export const membersRelations = relations(members, ({ one }) => ({
+  user: one(users, {
+    fields: [members.userId],
+    references: [users.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [members.workspaceId],
+    references: [workspaces.id],
   }),
 }))
