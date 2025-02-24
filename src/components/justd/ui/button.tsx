@@ -44,6 +44,9 @@ const buttonStyles = tv({
         '[--btn-bg-hovered:var(--btn-danger-hovered)] [--btn-border-hovered:var(--btn-danger-hovered)]',
         'inset-shadow-danger-fg/30 data-hovered:inset-shadow-danger-fg/35 data-pressed:inset-shadow-danger-fg/30',
       ],
+      transparent: [
+        'bg-transparent hover:bg-neutral-200/60 outline-none border-none',
+      ],
     },
     appearance: {
       solid: [
@@ -87,7 +90,7 @@ const buttonStyles = tv({
 })
 
 interface ButtonProps extends ButtonPrimitiveProps {
-  intent?: 'primary' | 'secondary' | 'danger' | 'warning'
+  intent?: 'primary' | 'secondary' | 'danger' | 'warning' | 'transparent'
   size?: 'medium' | 'large' | 'square-petite' | 'extra-small' | 'small'
   shape?: 'square' | 'circle'
   appearance?: 'solid' | 'outline' | 'plain'
