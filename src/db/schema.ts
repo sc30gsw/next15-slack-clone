@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import {
   index,
   integer,
@@ -8,21 +8,6 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/sqlite-core'
 import type { AdapterAccountType } from 'next-auth/adapters'
-
-export const tasksTable = sqliteTable('tasks', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  title: text('title').notNull(),
-  isCompleted: integer('is_completed', { mode: 'boolean' })
-    .notNull()
-    .$default(() => false),
-  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-  updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
-    () => new Date(),
-  ),
-})
-
-export type InsertPost = typeof tasksTable.$inferInsert
-export type SelectPost = typeof tasksTable.$inferSelect
 
 export const users = sqliteTable(
   'user',
@@ -45,6 +30,10 @@ export const users = sqliteTable(
     uniqueIndex('name').on(user.name),
   ],
 )
+
+export const usersRelations = relations(users, ({ many }) => ({
+  workspaces: many(workspaces),
+}))
 
 export type InsertUser = typeof users.$inferInsert
 export type SelectUser = typeof users.$inferSelect
@@ -83,3 +72,28 @@ export const sessions = sqliteTable('session', {
 })
 
 export type InsertSession = typeof sessions.$inferInsert
+
+export const workspaces = sqliteTable('workspaces', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  joinCode: text('join_code').notNull(),
+  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+  updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+    () => new Date(),
+  ),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+})
+
+export type InsertPost = typeof workspaces.$inferInsert
+export type SelectPost = typeof workspaces.$inferSelect
+
+export const workspacesRelations = relations(workspaces, ({ one }) => ({
+  user: one(users, {
+    fields: [workspaces.userId],
+    references: [users.id],
+  }),
+}))
