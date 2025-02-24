@@ -1,10 +1,7 @@
 import { Skeleton } from '@/components/justd/ui'
+import { getWorkspaceMembers } from '@/features/members/server/fetcher'
 import { WorkspaceHeader } from '@/features/workspaces/components/workspace-header'
-import {
-  getWorkspace,
-  getWorkspaceMembers,
-} from '@/features/workspaces/server/fetcher'
-import type {} from 'hono'
+import { getWorkspace } from '@/features/workspaces/server/fetcher'
 import { IconTriangleExclamation } from 'justd-icons'
 import { Suspense } from 'react'
 

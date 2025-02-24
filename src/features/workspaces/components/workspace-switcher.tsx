@@ -2,19 +2,14 @@
 
 import { Button, Menu } from '@/components/justd/ui'
 import { useCreateWorkspaceModal } from '@/features/workspaces/hooks/use-create-workspace-modal'
-import type { client } from '@/lib/rpc'
-import type { InferResponseType } from 'hono'
+import type { Workspace, Workspaces } from '@/features/workspaces/types'
 import { IconSquarePlus } from 'justd-icons'
 import { useRouter } from 'next/navigation'
 import { use } from 'react'
 
 type WorkspaceSwitcherProps = {
-  workspacesPromise: Promise<
-    InferResponseType<typeof client.api.workspaces.$get, 200>
-  >
-  workspacePromise: Promise<
-    InferResponseType<(typeof client.api.workspaces)[':id']['$get'], 200>
-  >
+  workspacesPromise: Promise<Workspaces>
+  workspacePromise: Promise<Workspace>
 }
 
 export const WorkspaceSwitcher = ({

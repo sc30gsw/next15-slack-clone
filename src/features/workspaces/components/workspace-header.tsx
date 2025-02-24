@@ -2,16 +2,11 @@
 
 import { Button, Menu } from '@/components/justd/ui'
 import { Hint } from '@/components/ui/hint'
-import type { client } from '@/lib/rpc'
-import type { InferResponseType } from 'hono'
+import type { Workspace } from '@/features/workspaces/types'
 import { IconChevronDown, IconFilter2, IconPencilBox } from 'justd-icons'
-import type {} from 'react'
 
 type WorkspaceHeaderProps = {
-  workspaceName: Pick<
-    InferResponseType<(typeof client.api.workspaces)[':id']['$get'], 200>,
-    'name'
-  >['name']
+  workspaceName: Workspace['name']
   isAdmin: boolean
 }
 
