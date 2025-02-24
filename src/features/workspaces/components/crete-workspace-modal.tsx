@@ -8,25 +8,28 @@ import {
   createWorkspaceInputSchema,
 } from '@/features/workspaces/types/schemas/create-workspace-input-schema'
 import { useSafeForm } from '@/hooks/use-safe-form'
+import { cn } from '@/utils/classes'
 import { getFormProps, getInputProps } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useActionState } from 'react'
 import { toast } from 'sonner'
 
 export const CreateWorkSpaceModal = () => {
-  const router = useRouter()
+  const pathname = usePathname()
+
+  const [open, setOpen] = useCreateWorkspaceModal()
 
   const [lastResult, action, isPending] = useActionState<
     Awaited<ReturnType<typeof createWorkspaceAction>> | null,
     FormData
   >(async (prev, formData) => {
-    const result = await createWorkspaceAction(prev, formData)
+    const result = await createWorkspaceAction(prev, formData, pathname === '/')
 
     if (result.status === 'success') {
       toast.success('Workspace created')
 
-      router.push(`/workspace/${result.initialValue?.name}`)
+      setOpen(false)
     }
 
     return null
@@ -43,10 +46,8 @@ export const CreateWorkSpaceModal = () => {
     },
   })
 
-  const [open, setOpen] = useCreateWorkspaceModal()
-
   return (
-    <Modal isOpen={open} onOpenChange={setOpen}>
+    <Modal isOpen={pathname === '/' || open} onOpenChange={setOpen}>
       <Modal.Content>
         <Modal.Header>
           <Modal.Title>Add a workspace</Modal.Title>
@@ -65,8 +66,15 @@ export const CreateWorkSpaceModal = () => {
               {fields.name.errors}
             </span>
           </Modal.Body>
-          <Modal.Footer>
-            <Modal.Close isDisabled={isPending}>Cancel</Modal.Close>
+          <Modal.Footer
+            className={cn(pathname === '/' && 'flex justify-end w-full')}
+          >
+            <Modal.Close
+              isDisabled={isPending}
+              className={cn(pathname === '/' && 'hidden')}
+            >
+              Cancel
+            </Modal.Close>
             <Button
               type="submit"
               isDisabled={isPending}
