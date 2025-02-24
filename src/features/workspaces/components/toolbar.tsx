@@ -8,7 +8,7 @@ type ToolbarProps = {
 }
 
 export const Toolbar = ({ workspaceId }: ToolbarProps) => {
-  const workspacePromise = getWorkspace(workspaceId)
+  const workspacePromise = getWorkspace({ param: { id: workspaceId } })
 
   return (
     <div className="bg-[#481349] flex items-center justify-between h-10 p-1.5">
