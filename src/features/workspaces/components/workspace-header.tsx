@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Menu } from '@/components/justd/ui'
+import { Menu } from '@/components/justd/ui'
 import { Hint } from '@/components/ui/hint'
 import type { Workspace } from '@/features/workspaces/types'
 import { IconChevronDown, IconFilter2, IconPencilBox } from 'justd-icons'
@@ -18,14 +18,10 @@ export const WorkspaceHeader = ({
     <div className="flex items-center justify-between px-4 h-[49px] gap-0.5">
       <Menu>
         <Menu.Trigger>
-          <Button
-            intent="transparent"
-            size="small"
-            className="font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60"
-          >
+          <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none font-semibold text-white text-lg w-auto p-1.5 overflow-hidden rounded-md cursor-pointer">
             <span className="truncate">{workspaceName}</span>
             <IconChevronDown className="size-4 ml-1 shrink-0" />
-          </Button>
+          </div>
         </Menu.Trigger>
         <Menu.Content placement="bottom start" className="w-64">
           <Menu.Item className="cursor-pointer capitalize flex items-center gap-1">
@@ -51,24 +47,14 @@ export const WorkspaceHeader = ({
       </Menu>
       <div className="flex items-center gap-0.5">
         <Hint label="Search" placement="bottom" showArrow={false}>
-          <Button
-            intent="transparent"
-            size="square-petite"
-            appearance="outline"
-            className="font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60"
-          >
+          <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60 size-9 shrink-0 rounded-md cursor-pointer">
             <IconFilter2 className="size-4" />
-          </Button>
+          </div>
         </Hint>
         <Hint label="New message" placement="bottom" showArrow={false}>
-          <Button
-            intent="transparent"
-            size="square-petite"
-            appearance="outline"
-            className="font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60"
-          >
+          <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60 size-9 shrink-0 rounded-md cursor-pointer">
             <IconPencilBox className="size-4" />
-          </Button>
+          </div>
         </Hint>
       </div>
     </div>

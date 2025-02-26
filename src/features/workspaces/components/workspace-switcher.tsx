@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Menu } from '@/components/justd/ui'
+import { Menu } from '@/components/justd/ui'
 import { useCreateWorkspaceModal } from '@/features/workspaces/hooks/use-create-workspace-modal'
 import type { Workspace, Workspaces } from '@/features/workspaces/types'
 import { IconSquarePlus } from 'justd-icons'
@@ -30,12 +30,9 @@ export const WorkspaceSwitcher = ({
   return (
     <Menu>
       <Menu.Trigger>
-        <Button
-          intent="secondary"
-          className="size-9 relative overflow-hidden text-slate-800 font-semibold"
-        >
+        <div className="flex items-center justify-center size-9 relative overflow-hidden text-slate-800 font-semibold bg-secondary/90 rounded-md cursor-pointer hover:bg-secondary/80">
           {workspace.name.charAt(0).toUpperCase()}
-        </Button>
+        </div>
       </Menu.Trigger>
       <Menu.Content placement="bottom start" className="w-64">
         <Menu.Item
