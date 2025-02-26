@@ -1,5 +1,6 @@
 'use client'
 
+import { JotaiProvider } from '@/components/providers/jotai-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import type { Route } from 'next'
 import { SessionProvider } from 'next-auth/react'
@@ -26,7 +27,9 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <RouterProvider navigate={navigate}>
       <ThemeProvider enableSystem={true} attribute="class">
-        <SessionProvider>{children}</SessionProvider>
+        <JotaiProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </JotaiProvider>
       </ThemeProvider>
     </RouterProvider>
   )
