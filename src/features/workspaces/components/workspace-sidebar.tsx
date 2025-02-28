@@ -2,6 +2,7 @@ import { Skeleton } from '@/components/justd/ui'
 import { getWorkspaceMembers } from '@/features/members/server/fetcher'
 import { WorkspaceHeader } from '@/features/workspaces/components/workspace-header'
 import { getWorkspace } from '@/features/workspaces/server/fetcher'
+import { getSession } from '@/lib/auth/session'
 import { IconTriangleExclamation } from 'justd-icons'
 import { Suspense } from 'react'
 
@@ -12,10 +13,12 @@ type WorkspaceSidebarProps = {
 export const WorkspaceSidebar = async ({
   workspaceId,
 }: WorkspaceSidebarProps) => {
-  const [res, workspace] = await Promise.all([
-    getWorkspaceMembers({ param: { workspaceId } }),
-    getWorkspace({ param: { id: workspaceId } }),
-  ])
+  const session = await getSession()
+
+  const res = await getWorkspaceMembers({
+    param: { workspaceId },
+    userId: session?.user?.id,
+  })
 
   if (!res.member) {
     return (
@@ -25,6 +28,11 @@ export const WorkspaceSidebar = async ({
       </div>
     )
   }
+
+  const workspace = await getWorkspace({
+    param: { id: workspaceId },
+    userId: session?.user?.id,
+  })
 
   return (
     <Suspense
