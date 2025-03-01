@@ -1,32 +1,47 @@
 import { Button, Loader, Modal } from '@/components/justd/ui'
 import { deleteWorkspaceAction } from '@/features/workspaces/actions/delete-workspace-action'
+import { EditWorkspaceModal } from '@/features/workspaces/components/edit-workspace-modal'
+import type { Workspace } from '@/features/workspaces/types'
+import { Confirm } from '@/hooks/use-confirm'
 import { IconTrash } from 'justd-icons'
 import { useParams, useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import { toast } from 'sonner'
 
 type PreferencesModalProps = {
   open: boolean
   setOpen: (open: boolean) => void
-  initialValue: string
+  workspaceName: Workspace['name']
 }
 
 export const PreferencesModal = ({
   open,
   setOpen,
-  initialValue,
+  workspaceName,
 }: PreferencesModalProps) => {
-  const params = useParams<Record<'workspaceId', string>>()
-  const [value, setValue] = useState(initialValue)
-  const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const params = useParams<Record<'workspaceId', string>>()
 
-  const deleteWorkspace = () => {
+  const [isPending, startTransition] = useTransition()
+
+  const deleteWorkspace = async () => {
+    const ok = await Confirm.call({
+      title: 'Are you sure?',
+      message: 'This action is irreversible.',
+    })
+
+    if (!ok) {
+      return
+    }
+
     startTransition(async () => {
-      await deleteWorkspaceAction(params.workspaceId)
-      toast.success('Workspace deleted')
-
-      router.push('/workspace/b1a18a27-a35f-4ff3-b7b0-e52d35e0cf93')
+      try {
+        await deleteWorkspaceAction(params.workspaceId)
+        toast.success('Workspace deleted')
+        router.replace('/')
+      } catch (_) {
+        toast.error('Failed to delete workspace')
+      }
     })
   }
 
@@ -34,18 +49,13 @@ export const PreferencesModal = ({
     <Modal isOpen={open} onOpenChange={setOpen}>
       <Modal.Content classNames={{ content: 'p-0 bg-gray-50 overflow-hidden' }}>
         <Modal.Header className="p-4 border-b bg-white">
-          <Modal.Title>{value}</Modal.Title>
+          <Modal.Title>{workspaceName}</Modal.Title>
         </Modal.Header>
         <div className="flex flex-col gap-y-2 px-4 py-4">
-          <div className="px-5 py-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold">Workspace name</p>
-              <p className="text-sm text-[#1264a3] hover:underline font-semibold">
-                Edit
-              </p>
-            </div>
-            <p className="text-sm">{value}</p>
-          </div>
+          <EditWorkspaceModal
+            workspaceName={workspaceName}
+            isDisabled={isPending}
+          />
           <Button
             isDisabled={isPending}
             onPress={deleteWorkspace}
@@ -59,14 +69,6 @@ export const PreferencesModal = ({
             {isPending && <Loader />}
           </Button>
         </div>
-        <form className="space-y-4">
-          <Modal.Body>
-            <input placeholder="hoge" />
-          </Modal.Body>
-          <Modal.Footer>
-            <Modal.Close>Cancel</Modal.Close>
-          </Modal.Footer>
-        </form>
       </Modal.Content>
     </Modal>
   )
