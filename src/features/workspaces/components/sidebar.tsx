@@ -6,6 +6,7 @@ import {
   getWorkspace,
   getWorkspaces,
 } from '@/features/workspaces/server/fetcher'
+import { getSession } from '@/lib/auth/session'
 import {
   IconBell,
   IconDotsHorizontal,
@@ -18,9 +19,14 @@ type SidebarProps = {
   workspaceId: string
 }
 
-export const Sidebar = ({ workspaceId }: SidebarProps) => {
-  const workspacesPromise = getWorkspaces()
-  const workspacePromise = getWorkspace(workspaceId)
+export const Sidebar = async ({ workspaceId }: SidebarProps) => {
+  const session = await getSession()
+
+  const workspacesPromise = getWorkspaces(session?.user?.id)
+  const workspacePromise = getWorkspace({
+    param: { id: workspaceId },
+    userId: session?.user?.id,
+  })
 
   return (
     <aside className="w-[70px] h-full bg-[#481349] flex flex-col gap-y-4 items-center pt-[9px] pb-4">

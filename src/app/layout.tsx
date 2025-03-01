@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Toast } from '@/components/justd/ui'
 import { Providers } from '@/components/providers/providers'
+import { CreateWorkSpaceModal } from '@/features/workspaces/components/crete-workspace-modal'
+import { Root } from '@/hooks/use-confirm'
 import type { ReactNode } from 'react'
 
 const geistSans = Geist({
@@ -38,6 +40,8 @@ const RootLayout = ({
       >
         <Providers>
           <Toast />
+          <Root />
+          <CreateWorkSpaceModal />
           {children}
         </Providers>
       </body>

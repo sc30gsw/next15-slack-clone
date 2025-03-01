@@ -1,5 +1,6 @@
 import { Button, Skeleton } from '@/components/justd/ui'
 import { getWorkspace } from '@/features/workspaces/server/fetcher'
+import { getSession } from '@/lib/auth/session'
 import { IconCircleInfo, IconSearch } from 'justd-icons'
 import { Suspense } from 'react'
 
@@ -7,8 +8,12 @@ type ToolbarProps = {
   workspaceId: string
 }
 
-export const Toolbar = ({ workspaceId }: ToolbarProps) => {
-  const workspacePromise = getWorkspace(workspaceId)
+export const Toolbar = async ({ workspaceId }: ToolbarProps) => {
+  const session = await getSession()
+  const workspacePromise = getWorkspace({
+    param: { id: workspaceId },
+    userId: session?.user?.id,
+  })
 
   return (
     <div className="bg-[#481349] flex items-center justify-between h-10 p-1.5">
