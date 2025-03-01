@@ -19,21 +19,6 @@ const app = new Hono()
       .innerJoin(members, eq(workspaces.id, members.workspaceId))
       .where(eq(members.userId, user.id))
 
-    // const workspaceLists = await db.query.workspaces
-    //   .findMany({
-    //     where: (workspaces, { eq }) =>
-    //       eq(workspaces.userId, placeholder('userId')),
-    //     with: {
-    //       members: {
-    //         where: (members, { eq }) =>
-    //           eq(members.userId, placeholder('userId')),
-    //       },
-    //     },
-    //   })
-    //   .prepare()
-
-    // const workspaceListss = await workspaceLists.execute({ userId: user.id })
-
     return c.json(workspaceList, 200)
   })
   .get('/:id', sessionMiddleware, async (c) => {
