@@ -14,7 +14,6 @@ export const getWorkspaces = async (userId?: string) => {
 
   const res = await fetcher<Workspaces>(url, {
     headers: {
-      // biome-ignore lint/style/useNamingConvention: this is a protected api
       Authorization: userId ?? '',
     },
   })
@@ -33,7 +32,6 @@ export const getWorkspace = async (
 
   const res = await fetcher<Workspace>(url, {
     headers: {
-      // biome-ignore lint/style/useNamingConvention: this is a protected api
       Authorization: req.userId ?? '',
     },
   })

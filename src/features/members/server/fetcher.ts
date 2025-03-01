@@ -20,7 +20,6 @@ export const getWorkspaceMembers = async (
 
   const res = await fetcher<ResType>(url, {
     headers: {
-      // biome-ignore lint/style/useNamingConvention: this is a protected api
       Authorization: req.userId ?? '',
     },
   })
