@@ -12,5 +12,12 @@ type FieldValues<T extends Record<string, any>> = Parameters<
 // biome-ignore lint/suspicious/noExplicitAny: This is a type definition in conform
 export const useSafeForm = <T extends Record<string, any>>(
   options: Omit<FieldValues<T>, 'defaultValue'> &
-    Required<Pick<FieldValues<T>, 'defaultValue'>>,
+    Required<
+      Pick<
+        {
+          defaultValue: Exclude<FieldValues<T>['defaultValue'], null>
+        },
+        'defaultValue'
+      >
+    >,
 ): ReturnType<typeof useForm<T>> => useForm<T>(options)
