@@ -2,8 +2,10 @@
 
 import { Menu } from '@/components/justd/ui'
 import { Hint } from '@/components/ui/hint'
+import { PreferencesModal } from '@/features/workspaces/components/preferences-modal'
 import type { Workspace } from '@/features/workspaces/types'
 import { IconChevronDown, IconFilter2, IconPencilBox } from 'justd-icons'
+import { useState } from 'react'
 
 type WorkspaceHeaderProps = {
   workspaceName: Workspace['name']
@@ -14,9 +16,15 @@ export const WorkspaceHeader = ({
   workspaceName,
   isAdmin,
 }: WorkspaceHeaderProps) => {
+  const [open, setOpen] = useState(false)
+
   return (
     <>
-      {/* <PreferencesModal /> */}
+      <PreferencesModal
+        open={open}
+        setOpen={setOpen}
+        workspaceName={workspaceName}
+      />
       <div className="flex items-center justify-between px-4 h-[49px] gap-0.5">
         <Menu>
           <Menu.Trigger>
@@ -42,7 +50,10 @@ export const WorkspaceHeader = ({
                   Invite people to {workspaceName}
                 </Menu.Item>
                 <Menu.Separator />
-                <Menu.Item className="cursor-pointer py-2">
+                <Menu.Item
+                  onAction={() => setOpen(true)}
+                  className="cursor-pointer py-2"
+                >
                   Preference
                 </Menu.Item>
               </>
