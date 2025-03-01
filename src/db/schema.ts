@@ -106,6 +106,7 @@ export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
     references: [users.id],
   }),
   members: many(members),
+  channels: many(channels),
 }))
 
 export const members = sqliteTable(
@@ -139,6 +140,37 @@ export const membersRelations = relations(members, ({ one }) => ({
   }),
   workspace: one(workspaces, {
     fields: [members.workspaceId],
+    references: [workspaces.id],
+  }),
+}))
+
+export const channels = sqliteTable(
+  'channels',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: text('name').notNull(),
+    workspaceId: text('workspaceId')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (channels) => [
+    index('channel_workspaceId').on(channels.workspaceId),
+    uniqueIndex('workspaceId_name').on(channels.workspaceId, channels.name),
+  ],
+)
+
+export type InsertChannel = typeof channels.$inferInsert
+export type SelectChannel = typeof channels.$inferSelect
+
+export const channelsRelations = relations(channels, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [channels.workspaceId],
     references: [workspaces.id],
   }),
 }))
