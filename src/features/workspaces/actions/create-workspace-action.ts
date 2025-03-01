@@ -7,7 +7,7 @@ import { createWorkspaceInputSchema } from '@/features/workspaces/types/schemas/
 import { getSession } from '@/lib/auth/session'
 import { parseWithZod } from '@conform-to/zod'
 import { revalidateTag } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { redirect, unauthorized } from 'next/navigation'
 
 const generateCode = () => {
   const code = Array.from(
@@ -37,34 +37,34 @@ export const createWorkspaceAction = async (
   const session = await getSession()
 
   if (!session?.user?.id) {
-    throw new Error('Unauthorized')
+    unauthorized()
   }
 
-  const [newWorkspace] = await db
+  const [newWorkspaceId] = await db
     .insert(workspaces)
     .values({
       name: submission.value.name,
       joinCode: generateCode(),
       userId: session.user.id,
     })
-    .returning()
+    .returning({ id: workspaces.id })
 
   await db.insert(members).values({
     userId: session.user.id,
-    workspaceId: newWorkspace.id,
+    workspaceId: newWorkspaceId.id,
     role: 'admin',
   })
 
   revalidateTag(getWorkspacesCacheKey)
 
   if (isRedirect) {
-    redirect(`/workspace/${newWorkspace.id}`)
+    redirect(`/workspace/${newWorkspaceId.id}`)
   }
 
   return {
     status: 'success',
     initialValue: {
-      name: newWorkspace.id,
+      name: newWorkspaceId.id,
     },
   } as const satisfies ReturnType<typeof submission.reply>
 }

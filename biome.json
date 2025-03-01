@@ -43,6 +43,7 @@
         "loading.tsx",
         "error.tsx",
         "not-found.tsx",
+        "unauthorized.tsx",
         "middleware.ts",
         "default.tsx",
         "postcss.config.mjs",
@@ -105,6 +106,7 @@
     },
     {
       "include": [
+        "fetcher.ts",
         "src/env.ts",
         "schema.ts",
         "./src/features/**/types/schemas/*.ts"

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     reactCompiler: true,
     ppr: 'incremental',
     useCache: true,
+    authInterrupts: true,
   },
 }
 
