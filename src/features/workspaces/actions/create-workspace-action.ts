@@ -2,7 +2,7 @@
 
 import { getWorkspacesCacheKey } from '@/constants/cache-keys'
 import { db } from '@/db/db'
-import { members, workspaces } from '@/db/schema'
+import { channels, members, workspaces } from '@/db/schema'
 import { createWorkspaceInputSchema } from '@/features/workspaces/types/schemas/create-workspace-input-schema'
 import { getSession } from '@/lib/auth/session'
 import { parseWithZod } from '@conform-to/zod'
@@ -53,6 +53,11 @@ export const createWorkspaceAction = async (
     userId: session.user.id,
     workspaceId: newWorkspaceId.id,
     role: 'admin',
+  })
+
+  await db.insert(channels).values({
+    name: 'general',
+    workspaceId: newWorkspaceId.id,
   })
 
   revalidateTag(getWorkspacesCacheKey)
