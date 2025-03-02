@@ -17,6 +17,7 @@
 		"@conform-to/zod": "^1.2.2",
 		"@libsql/client": "^0.14.0",
 		"@t3-oss/env-nextjs": "^0.12.0",
+		"@tabler/icons-react": "^3.30.0",
 		"@tailwindcss/postcss": "^4.0.0",
 		"babel-plugin-react-compiler": "^19.0.0-beta-decd7b8-20250118",
 		"bcryptjs": "^2.4.3",
@@ -32,6 +33,7 @@
 		"react-call": "^1.7.0",
 		"react-dom": "^19.0.0",
 		"react-resizable-panels": "^2.1.7",
+		"react-use": "^17.6.0",
 		"server-only": "^0.0.1",
 		"sonner": "^1.7.4",
 		"zod": "^3.24.1"
