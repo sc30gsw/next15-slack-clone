@@ -1,8 +1,9 @@
 'use client'
-
 import { CreateWorkSpaceModal } from '@/features/workspaces/components/crete-workspace-modal'
 import type { ReactNode } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
+
+export const experimental_ppr = true
 
 const WorkspaceIdLayout = ({
   children,
