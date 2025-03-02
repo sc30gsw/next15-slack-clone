@@ -34,7 +34,7 @@ export const SidebarButton = ({ icon, label }: SidebarButtonProps) => {
         appearance="outline"
         size="square-petite"
         className={cn(
-          'size-9 p-2 text-white bg-transparent group-hover:bg-neutral-200/60 data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60 outline-none border-none',
+          'size-9 p-2 text-white bg-transparent group-hover:bg-neutral-200/20 data-hovered:bg-neutral-200/20 data-pressed:bg-neutral-200/20 outline-none border-none',
           getIsActive() && 'bg-neutral-200/40',
         )}
       >

@@ -36,7 +36,7 @@ export const Sidebar = async ({ workspaceId }: SidebarProps) => {
             intent="secondary"
             className="size-9 relative overflow-hidden text-slate-800 font-semibold"
           >
-            <Loader />
+            <Loader className="animate-spin" />
           </Button>
         }
       >

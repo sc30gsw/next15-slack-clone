@@ -19,11 +19,11 @@ export const UserButton = () => {
 
   if (status === 'loading' || !session) {
     return (
-      <Menu>
-        <Menu.Trigger>
-          <Skeleton intent="lighter" shape="circle" className="size-10" />
-        </Menu.Trigger>
-      </Menu>
+      <Skeleton
+        intent="lighter"
+        shape="circle"
+        className="size-10 bg-zinc-400/40"
+      />
     )
   }
 
@@ -33,9 +33,10 @@ export const UserButton = () => {
         <Avatar
           alt={session.user?.name ?? 'User'}
           size="large"
+          shape="square"
           src={session.user?.image}
           initials={session.user?.name?.charAt(0).toUpperCase()}
-          className="hover:opacity-75 transition cursor-pointer bg-sky-500 text-white"
+          className="hover:opacity-75 transition cursor-pointer bg-sky-500 text-white rounded-md"
         />
       </Menu.Trigger>
       <Menu.Content placement="right" showArrow={true} className="w-60">
