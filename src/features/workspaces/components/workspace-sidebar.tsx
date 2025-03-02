@@ -35,6 +35,7 @@ export const WorkspaceSidebar = async ({
       </div>
     )
   }
+
   return (
     <div className="flex flex-col bg-[#5E2C5F] h-full">
       <Suspense
