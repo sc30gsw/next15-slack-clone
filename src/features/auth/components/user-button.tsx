@@ -33,9 +33,10 @@ export const UserButton = () => {
         <Avatar
           alt={session.user?.name ?? 'User'}
           size="large"
+          shape="square"
           src={session.user?.image}
           initials={session.user?.name?.charAt(0).toUpperCase()}
-          className="hover:opacity-75 transition cursor-pointer bg-sky-500 text-white"
+          className="hover:opacity-75 transition cursor-pointer bg-sky-500 text-white rounded-md"
         />
       </Menu.Trigger>
       <Menu.Content placement="right" showArrow={true} className="w-60">
