@@ -1,14 +1,40 @@
 import { Skeleton } from '@/components/justd/ui'
+import { getWorkspaceCurrentMember } from '@/features/members/server/fetcher'
 import { SidebarItem } from '@/features/workspaces/components/sidebar-item'
+import { WorkspaceChannels } from '@/features/workspaces/components/workspace-channels'
 import { WorkspaceHeaderContainer } from '@/features/workspaces/components/workspace-header-container'
-import { IconMessageDots, IconSend2 } from 'justd-icons'
+import { WorkspaceMembers } from '@/features/workspaces/components/workspace-members'
+import { WorkspaceSection } from '@/features/workspaces/components/workspace-section'
+import { getSession } from '@/lib/auth/session'
+import {
+  IconMessageDots,
+  IconSend2,
+  IconTriangleExclamation,
+} from 'justd-icons'
 import { Suspense } from 'react'
 
 type WorkspaceSidebarProps = {
   workspaceId: string
 }
 
-export const WorkspaceSidebar = ({ workspaceId }: WorkspaceSidebarProps) => {
+export const WorkspaceSidebar = async ({
+  workspaceId,
+}: WorkspaceSidebarProps) => {
+  const session = await getSession()
+
+  const res = await getWorkspaceCurrentMember({
+    param: { workspaceId },
+    userId: session?.user?.id,
+  })
+
+  if (!res.member) {
+    return (
+      <div className="flex flex-col bg-[#5E2C5F] h-full items-center justify-center">
+        <IconTriangleExclamation className="size-5 text-white" />
+        <p className="text-white text-sm">Workspace not found</p>
+      </div>
+    )
+  }
   return (
     <div className="flex flex-col bg-[#5E2C5F] h-full">
       <Suspense
@@ -18,7 +44,10 @@ export const WorkspaceSidebar = ({ workspaceId }: WorkspaceSidebarProps) => {
           </div>
         }
       >
-        <WorkspaceHeaderContainer workspaceId={workspaceId} />
+        <WorkspaceHeaderContainer
+          workspaceId={workspaceId}
+          isAdmin={res.member.role === 'admin'}
+        />
       </Suspense>
 
       <div className="flex flex-col px-2 mt-3">
@@ -35,6 +64,37 @@ export const WorkspaceSidebar = ({ workspaceId }: WorkspaceSidebarProps) => {
           icon={IconSend2}
         />
       </div>
+      <WorkspaceSection label="Channels" hint="New channel" isNew={true}>
+        <Suspense
+          fallback={
+            <Skeleton
+              intent="lighter"
+              className="h-4 w-22 ml-4 bg-zinc-400/40"
+            />
+          }
+        >
+          <WorkspaceChannels workspaceId={workspaceId} />
+        </Suspense>
+      </WorkspaceSection>
+      <WorkspaceSection
+        label="Direct Messages"
+        hint="New direct message"
+        isNew={true}
+      >
+        <Suspense
+          fallback={
+            <div className="flex items-center gap-1.5 ml-4">
+              <Skeleton
+                intent="lighter"
+                className="size-6 mr-4 bg-zinc-400/40"
+              />
+              <Skeleton intent="lighter" className="h-4 w-20 bg-zinc-400/40" />
+            </div>
+          }
+        >
+          <WorkspaceMembers workspaceId={workspaceId} />
+        </Suspense>
+      </WorkspaceSection>
     </div>
   )
 }
