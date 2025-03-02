@@ -1,3 +1,5 @@
+'use client'
+
 import { Tooltip } from '@/components/justd/ui'
 import type { ComponentProps, ReactNode } from 'react'
 
