@@ -8,16 +8,13 @@ import { useRouter } from 'next/navigation'
 import { use } from 'react'
 
 type WorkspaceSwitcherProps = {
-  workspacesPromise: Promise<Workspaces>
-  workspacePromise: Promise<Workspace>
+  workspacePromises: Promise<[Workspaces, Workspace]>
 }
 
 export const WorkspaceSwitcher = ({
-  workspacesPromise,
-  workspacePromise,
+  workspacePromises,
 }: WorkspaceSwitcherProps) => {
-  const workspaces = use(workspacesPromise)
-  const workspace = use(workspacePromise)
+  const [workspaces, workspace] = use(workspacePromises)
 
   const filteredWorkspaces = workspaces.filter(
     (item) => item.id !== workspace.id,

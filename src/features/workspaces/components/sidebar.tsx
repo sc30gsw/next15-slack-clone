@@ -27,6 +27,7 @@ export const Sidebar = async ({ workspaceId }: SidebarProps) => {
     param: { id: workspaceId },
     userId: session?.user?.id,
   })
+  const workspacePromises = Promise.all([workspacesPromise, workspacePromise])
 
   return (
     <aside className="w-[70px] h-full bg-[#481349] flex flex-col gap-y-4 items-center pt-[9px] pb-4">
@@ -40,10 +41,7 @@ export const Sidebar = async ({ workspaceId }: SidebarProps) => {
           </Button>
         }
       >
-        <WorkspaceSwitcher
-          workspacesPromise={workspacesPromise}
-          workspacePromise={workspacePromise}
-        />
+        <WorkspaceSwitcher workspacePromises={workspacePromises} />
       </Suspense>
       <SidebarButton icon={<SidebarIcon icon={IconHome} />} label="Home" />
       <SidebarButton icon={<SidebarIcon icon={IconMessages} />} label="DMs" />
