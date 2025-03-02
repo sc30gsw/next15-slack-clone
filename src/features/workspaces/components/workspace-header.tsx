@@ -1,20 +1,21 @@
 'use client'
 
 import { Menu } from '@/components/justd/ui'
-import { Hint } from '@/components/ui/hint'
 import { PreferencesModal } from '@/features/workspaces/components/preferences-modal'
 import type { Workspace } from '@/features/workspaces/types'
-import { IconChevronDown, IconFilter2, IconPencilBox } from 'justd-icons'
-import { useState } from 'react'
+import { IconChevronDown } from 'justd-icons'
+import { type ReactNode, useState } from 'react'
 
 type WorkspaceHeaderProps = {
   workspaceName: Workspace['name']
   isAdmin: boolean
+  children: ReactNode
 }
 
 export const WorkspaceHeader = ({
   workspaceName,
   isAdmin,
+  children,
 }: WorkspaceHeaderProps) => {
   const [open, setOpen] = useState(false)
 
@@ -27,7 +28,7 @@ export const WorkspaceHeader = ({
       />
       <div className="flex items-center justify-between px-4 h-[49px] gap-0.5">
         <Menu>
-          <Menu.Trigger>
+          <Menu.Trigger className="truncate">
             <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none font-semibold text-white text-lg w-auto p-1.5 overflow-hidden rounded-md cursor-pointer">
               <span className="truncate">{workspaceName}</span>
               <IconChevronDown className="size-4 ml-1 shrink-0" />
@@ -60,18 +61,7 @@ export const WorkspaceHeader = ({
             )}
           </Menu.Content>
         </Menu>
-        <div className="flex items-center gap-0.5">
-          <Hint label="Search" placement="bottom" showArrow={false}>
-            <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60 size-9 shrink-0 rounded-md cursor-pointer">
-              <IconFilter2 className="size-4" />
-            </div>
-          </Hint>
-          <Hint label="New message" placement="bottom" showArrow={false}>
-            <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60 size-9 shrink-0 rounded-md cursor-pointer">
-              <IconPencilBox className="size-4" />
-            </div>
-          </Hint>
-        </div>
+        {children}
       </div>
     </>
   )

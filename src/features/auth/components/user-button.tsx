@@ -19,11 +19,11 @@ export const UserButton = () => {
 
   if (status === 'loading' || !session) {
     return (
-      <Menu>
-        <Menu.Trigger>
-          <Skeleton intent="lighter" shape="circle" className="size-10" />
-        </Menu.Trigger>
-      </Menu>
+      <Skeleton
+        intent="lighter"
+        shape="circle"
+        className="size-10 bg-zinc-400/40"
+      />
     )
   }
 
