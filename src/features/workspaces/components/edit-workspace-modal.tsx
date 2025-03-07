@@ -6,6 +6,7 @@ import {
   updateWorkspaceInputSchema,
 } from '@/features/workspaces/types/schemas/update-workspace-input-schema'
 import { useSafeForm } from '@/hooks/use-safe-form'
+import { withCallbacks } from '@/utils/with-callbacks'
 import { getFormProps, getInputProps } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { useParams } from 'next/navigation'
@@ -25,23 +26,20 @@ export const EditWorkspaceModal = ({
 
   const [open, setOpen] = useState(false)
 
-  const [lastResult, action, isPending] = useActionState<
-    Awaited<ReturnType<typeof updateWorkspaceAction> | null>,
-    FormData
-  >(async (prev, formData) => {
-    const result = await updateWorkspaceAction(prev, formData)
+  const [lastResult, action, isPending] = useActionState(
+    withCallbacks(updateWorkspaceAction, {
+      onError() {
+        toast.error('Failed to update workspace')
+      },
+      onSuccess(result) {
+        toast.success('Workspace updated')
+        setOpen(false)
 
-    if (result.status !== 'success') {
-      toast.error('Failed to update workspace')
-
-      return result
-    }
-
-    toast.success('Workspace updated')
-    setOpen(false)
-
-    return result
-  }, null)
+        return result
+      },
+    }),
+    null,
+  )
 
   const [form, fields] = useSafeForm<UpdateWorkspaceInput>({
     constraint: getZodConstraint(updateWorkspaceInputSchema),

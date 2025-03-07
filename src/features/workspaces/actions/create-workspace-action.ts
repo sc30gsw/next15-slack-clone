@@ -7,7 +7,7 @@ import { createWorkspaceInputSchema } from '@/features/workspaces/types/schemas/
 import { getSession } from '@/lib/auth/session'
 import { parseWithZod } from '@conform-to/zod'
 import { revalidateTag } from 'next/cache'
-import { redirect, unauthorized } from 'next/navigation'
+import { unauthorized } from 'next/navigation'
 
 const generateCode = () => {
   const code = Array.from(
@@ -21,11 +21,7 @@ const generateCode = () => {
   return code
 }
 
-export const createWorkspaceAction = async (
-  _: unknown,
-  formData: FormData,
-  isRedirect: boolean,
-) => {
+export const createWorkspaceAction = async (_: unknown, formData: FormData) => {
   const submission = parseWithZod(formData, {
     schema: createWorkspaceInputSchema,
   })
@@ -61,10 +57,6 @@ export const createWorkspaceAction = async (
   })
 
   revalidateTag(getWorkspacesCacheKey)
-
-  if (isRedirect) {
-    redirect(`/workspace/${newWorkspaceId.id}`)
-  }
 
   return {
     status: 'success',

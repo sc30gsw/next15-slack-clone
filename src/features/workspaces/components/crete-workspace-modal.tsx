@@ -9,31 +9,32 @@ import {
 } from '@/features/workspaces/types/schemas/create-workspace-input-schema'
 import { useSafeForm } from '@/hooks/use-safe-form'
 import { cn } from '@/utils/classes'
+import { withCallbacks } from '@/utils/with-callbacks'
 import { getFormProps, getInputProps } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useActionState } from 'react'
 import { toast } from 'sonner'
 
 export const CreateWorkSpaceModal = () => {
   const pathname = usePathname()
+  const router = useRouter()
 
   const [open, setOpen] = useCreateWorkspaceModal()
 
-  const [lastResult, action, isPending] = useActionState<
-    Awaited<ReturnType<typeof createWorkspaceAction>> | null,
-    FormData
-  >(async (prev, formData) => {
-    const result = await createWorkspaceAction(prev, formData, pathname === '/')
+  const [lastResult, action, isPending] = useActionState(
+    withCallbacks(createWorkspaceAction, {
+      onSuccess(result) {
+        toast.success('Workspace created')
+        setOpen(false)
 
-    if (result.status === 'success') {
-      toast.success('Workspace created')
-
-      setOpen(false)
-    }
-
-    return null
-  }, null)
+        if (pathname === '/') {
+          router.push(`/workspace/${result.initialValue?.name}`)
+        }
+      },
+    }),
+    null,
+  )
 
   const [form, fields] = useSafeForm<CreateWorkspaceInput>({
     constraint: getZodConstraint(createWorkspaceInputSchema),
