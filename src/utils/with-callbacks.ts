@@ -1,9 +1,6 @@
-// https://x.com/rwieruch/status/1897686642732785927
-type ActionState = Partial<{
-  status: 'success' | 'error'
-  initialValue: unknown
-}>
+import type { SubmissionResult } from '@conform-to/react'
 
+// https://x.com/rwieruch/status/1897686642732785927
 type Callbacks<T, R = unknown> = {
   onStart?: () => R
   onEnd?: (reference: R) => void
@@ -13,7 +10,7 @@ type Callbacks<T, R = unknown> = {
 
 export const withCallbacks = <
   Args extends unknown[],
-  T extends ActionState,
+  T extends SubmissionResult<string[]>,
   R = unknown,
 >(
   fn: (...args: Args) => Promise<T>,
