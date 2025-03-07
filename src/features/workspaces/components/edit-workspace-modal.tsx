@@ -31,11 +31,9 @@ export const EditWorkspaceModal = ({
       onError() {
         toast.error('Failed to update workspace')
       },
-      onSuccess(result) {
+      onSuccess() {
         toast.success('Workspace updated')
         setOpen(false)
-
-        return result
       },
     }),
     null,
