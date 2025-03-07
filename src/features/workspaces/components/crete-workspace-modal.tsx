@@ -12,24 +12,23 @@ import { cn } from '@/utils/classes'
 import { withCallbacks } from '@/utils/with-callbacks'
 import { getFormProps, getInputProps } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useActionState } from 'react'
 import { toast } from 'sonner'
 
 export const CreateWorkSpaceModal = () => {
   const pathname = usePathname()
-  const router = useRouter()
 
   const [open, setOpen] = useCreateWorkspaceModal()
 
   const [lastResult, action, isPending] = useActionState(
     withCallbacks(createWorkspaceAction, {
       onSuccess(result) {
-        toast.success('Workspace created')
         setOpen(false)
+        toast.success('Workspace created')
 
         if (pathname === '/') {
-          router.push(`/workspace/${result.initialValue?.name}`)
+          location.href = `/workspace/${result.initialValue?.name}`
         }
       },
     }),
