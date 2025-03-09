@@ -20,12 +20,11 @@ export const withCallbacks = <
     const promise = fn(...args)
 
     const reference = callbacks.onStart?.()
+    const result = await promise
 
     if (reference) {
       callbacks.onEnd?.(reference)
     }
-
-    const result = await promise
 
     if (result.status === 'success') {
       callbacks.onSuccess?.(result)
@@ -35,6 +34,6 @@ export const withCallbacks = <
       callbacks.onError?.(result)
     }
 
-    return result
+    return promise
   }
 }
