@@ -8,12 +8,19 @@ type HintProps = {
   children: ReactNode
   placement?: ComponentProps<typeof Tooltip.Content>['placement']
   showArrow?: ComponentProps<typeof Tooltip.Content>['showArrow']
+  onPress?: () => void
 }
 
-export const Hint = ({ label, children, placement, showArrow }: HintProps) => {
+export const Hint = ({
+  label,
+  children,
+  placement,
+  showArrow,
+  onPress,
+}: HintProps) => {
   return (
     <Tooltip delay={50}>
-      <Tooltip.Trigger>{children}</Tooltip.Trigger>
+      <Tooltip.Trigger onPress={onPress}>{children}</Tooltip.Trigger>
       <Tooltip.Content
         placement={placement}
         showArrow={showArrow}

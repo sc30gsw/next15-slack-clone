@@ -65,7 +65,13 @@ export const WorkspaceSidebar = async ({
           icon={IconSend2}
         />
       </div>
-      <WorkspaceSection label="Channels" hint="New channel" isNew={true}>
+      <WorkspaceSection
+        label="Channels"
+        hint="New channel"
+        isNew={true}
+        modalKinds="channel"
+        isAdmin={res.member.role === 'admin'}
+      >
         <Suspense
           fallback={
             <Skeleton
@@ -81,6 +87,8 @@ export const WorkspaceSidebar = async ({
         label="Direct Messages"
         hint="New direct message"
         isNew={true}
+        modalKinds="dm"
+        isAdmin={res.member.role === 'admin'}
       >
         <Suspense
           fallback={

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/justd/ui'
 import { Hint } from '@/components/ui/hint'
+import { useCreteChannelModal } from '@/features/channels/hooks/use-create-channel-modal'
 import { cn } from '@/utils/classes'
 import { IconCaretDownFilled } from '@tabler/icons-react'
 import { IconPlus } from 'justd-icons'
@@ -13,6 +14,8 @@ type WorkspaceSectionProps = {
   hint: string
   children: ReactNode
   isNew?: boolean
+  modalKinds: 'channel' | 'dm'
+  isAdmin: boolean
 }
 
 export const WorkspaceSection = ({
@@ -20,8 +23,11 @@ export const WorkspaceSection = ({
   hint,
   children,
   isNew,
+  modalKinds,
+  isAdmin,
 }: WorkspaceSectionProps) => {
   const [on, toggle] = useToggle(true)
+  const [_, setCreateChannelOpen] = useCreteChannelModal()
 
   return (
     <div className="flex flex-col mt-3 px-2">
@@ -47,7 +53,18 @@ export const WorkspaceSection = ({
         </div>
 
         {isNew && (
-          <Hint label={hint} placement="top" showArrow={false}>
+          <Hint
+            label={hint}
+            placement="top"
+            showArrow={false}
+            onPress={() => {
+              if (!isAdmin) {
+                return
+              }
+
+              modalKinds === 'channel' ? setCreateChannelOpen(true) : undefined
+            }}
+          >
             <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60 rounded-md cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity ml-auto p-0.5 text-sm text-[#f9edffcc] size-6 shrink-0">
               <IconPlus className="size-5" />
             </div>
