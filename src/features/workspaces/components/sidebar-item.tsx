@@ -41,7 +41,7 @@ export const SidebarItem = ({
 }: SidebarItemProps) => {
   const { base, link } = sidebarItemStyle({ variant })
   return (
-    <Button intent="transparent" size="small" className={base()}>
+    <Button intent="plain" size="small" className={base()}>
       <Link href={`/workspace/${workspaceId}/channel/${id}`} className={link()}>
         <Icon className="size-3.5 mr-1 shrink-0" />
         <span className="text-sm truncate">{label}</span>

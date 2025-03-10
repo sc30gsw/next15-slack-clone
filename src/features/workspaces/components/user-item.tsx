@@ -37,7 +37,7 @@ export const UserItem = ({ id, image, label, variant }: UserItemProps) => {
   const params = useParams<Record<'workspaceId', string>>()
 
   return (
-    <Button intent="transparent" size="medium" className={base()}>
+    <Button intent="plain" size="medium" className={base()}>
       <Link
         href={`/workspace/${params.workspaceId}/member/${id}`}
         className={link()}

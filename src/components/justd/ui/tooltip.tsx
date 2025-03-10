@@ -1,60 +1,58 @@
-'use client'
+"use client"
 
-import type { ComponentProps, ReactNode } from 'react'
-import type { TooltipProps as TooltipPrimitiveProps } from 'react-aria-components'
+import type { TooltipProps as TooltipPrimitiveProps } from "react-aria-components"
 import {
   Button,
   OverlayArrow,
   Tooltip as TooltipPrimitive,
   TooltipTrigger as TooltipTriggerPrimitive,
   composeRenderProps,
-} from 'react-aria-components'
-import type { VariantProps } from 'tailwind-variants'
-import { tv } from 'tailwind-variants'
+} from "react-aria-components"
+import type { VariantProps } from "tailwind-variants"
+import { tv } from "tailwind-variants"
 
 const tooltipStyles = tv({
   base: [
-    'group rounded-lg border px-2.5 py-1.5 text-sm will-change-transform dark:shadow-none [&_strong]:font-medium',
+    "group rounded-lg border px-2.5 py-1.5 text-sm will-change-transform dark:shadow-none [&_strong]:font-medium",
   ],
   variants: {
     intent: {
-      default:
-        'bg-overlay text-overlay-fg [&_.arx]:fill-overlay [&_.arx]:stroke-border',
+      default: "bg-overlay text-overlay-fg [&_.arx]:fill-overlay [&_.arx]:stroke-border",
       inverse:
-        'border-transparent bg-fg text-bg [&_.arx]:fill-fg [&_.arx]:stroke-transparent dark:[&_.arx]:fill-white [&_.text-muted-fg]:text-bg/70 dark:[&_.text-muted-fg]:text-fg/70',
+        "border-transparent bg-fg text-bg [&_.arx]:fill-fg [&_.arx]:stroke-transparent dark:[&_.arx]:fill-white [&_.text-muted-fg]:text-bg/70 dark:[&_.text-muted-fg]:text-fg/70",
     },
     isEntering: {
       true: [
-        'fade-in animate-in',
-        'data-[placement=left]:slide-in-from-right-1 data-[placement=right]:slide-in-from-left-1 data-[placement=top]:slide-in-from-bottom-1 data-[placement=bottom]:slide-in-from-top-1',
+        "fade-in animate-in",
+        "data-[placement=left]:slide-in-from-right-1 data-[placement=right]:slide-in-from-left-1 data-[placement=top]:slide-in-from-bottom-1 data-[placement=bottom]:slide-in-from-top-1",
       ],
     },
     isExiting: {
       true: [
-        'fade-in direction-reverse animate-in',
-        'data-[placement=left]:slide-out-to-right-1 data-[placement=right]:slide-out-to-left-1 data-[placement=top]:slide-out-to-bottom-1 data-[placement=bottom]:slide-out-to-top-1',
+        "fade-in direction-reverse animate-in",
+        "data-[placement=left]:slide-out-to-right-1 data-[placement=right]:slide-out-to-left-1 data-[placement=top]:slide-out-to-bottom-1 data-[placement=bottom]:slide-out-to-top-1",
       ],
     },
   },
   defaultVariants: {
-    intent: 'default',
+    intent: "default",
   },
 })
 
-type TooltipProps = ComponentProps<typeof TooltipTriggerPrimitive>
+type TooltipProps = React.ComponentProps<typeof TooltipTriggerPrimitive>
 const Tooltip = (props: TooltipProps) => <TooltipTriggerPrimitive {...props} />
 
 interface TooltipContentProps
-  extends Omit<TooltipPrimitiveProps, 'children'>,
+  extends Omit<TooltipPrimitiveProps, "children">,
     VariantProps<typeof tooltipStyles> {
   showArrow?: boolean
-  children: ReactNode
+  children: React.ReactNode
 }
 
 const TooltipContent = ({
   offset = 10,
   showArrow = true,
-  intent = 'default',
+  intent = "default",
   children,
   ...props
 }: TooltipContentProps) => {

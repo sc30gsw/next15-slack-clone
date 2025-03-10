@@ -73,12 +73,7 @@ export const WorkspaceSidebar = async ({
         isAdmin={res.member.role === 'admin'}
       >
         <Suspense
-          fallback={
-            <Skeleton
-              intent="lighter"
-              className="h-4 w-22 ml-4 bg-zinc-400/40"
-            />
-          }
+          fallback={<Skeleton className="h-4 w-22 ml-4 bg-zinc-400/40" />}
         >
           <WorkspaceChannels workspaceId={workspaceId} />
         </Suspense>
@@ -93,11 +88,8 @@ export const WorkspaceSidebar = async ({
         <Suspense
           fallback={
             <div className="flex items-center gap-1.5 ml-4">
-              <Skeleton
-                intent="lighter"
-                className="size-6 mr-4 bg-zinc-400/40"
-              />
-              <Skeleton intent="lighter" className="h-4 w-20 bg-zinc-400/40" />
+              <Skeleton className="size-6 mr-4 bg-zinc-400/40" />
+              <Skeleton className="h-4 w-20 bg-zinc-400/40" />
             </div>
           }
         >
