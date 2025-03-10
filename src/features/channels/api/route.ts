@@ -20,6 +20,7 @@ const app = new Hono().get('/:workspaceId', sessionMiddleware, async (c) => {
 
   const channelList = await db.query.channels.findMany({
     where: eq(channels.workspaceId, c.req.param('workspaceId')),
+    orderBy: (channels, { asc }) => [asc(channels.name)],
   })
 
   return c.json({ channels: channelList }, 200)
