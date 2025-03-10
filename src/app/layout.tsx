@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Toast } from '@/components/justd/ui'
 import { Providers } from '@/components/providers/providers'
-import { CreateWorkSpaceModal } from '@/features/workspaces/components/crete-workspace-modal'
+import { Modals } from '@/components/ui/modals'
 import { Root } from '@/hooks/use-confirm'
 import type { ReactNode } from 'react'
 
@@ -41,7 +41,7 @@ const RootLayout = ({
         <Providers>
           <Toast />
           <Root />
-          <CreateWorkSpaceModal />
+          <Modals />
           {children}
         </Providers>
       </body>
