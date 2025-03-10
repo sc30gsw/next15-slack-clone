@@ -45,16 +45,18 @@ export const createWorkspaceAction = async (_: unknown, formData: FormData) => {
     })
     .returning({ id: workspaces.id })
 
-  await db.insert(members).values({
+  const insertMembers = db.insert(members).values({
     userId: session.user.id,
     workspaceId: newWorkspaceId.id,
     role: 'admin',
   })
 
-  await db.insert(channels).values({
+  const insertChannels = db.insert(channels).values({
     name: 'general',
     workspaceId: newWorkspaceId.id,
   })
+
+  await Promise.all([insertMembers, insertChannels])
 
   revalidateTag(getWorkspacesCacheKey)
 
