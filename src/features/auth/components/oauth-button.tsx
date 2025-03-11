@@ -19,7 +19,7 @@ export const OauthButton = ({
   return (
     <Button
       isDisabled={isDisabled || isPending}
-      appearance="outline"
+      intent="outline"
       size="large"
       onPress={onClick}
       className="w-full relative"

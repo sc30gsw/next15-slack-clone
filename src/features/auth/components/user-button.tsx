@@ -18,13 +18,7 @@ export const UserButton = () => {
   const { data: session, status } = useSession()
 
   if (status === 'loading' || !session) {
-    return (
-      <Skeleton
-        intent="lighter"
-        shape="circle"
-        className="size-10 bg-zinc-400/40"
-      />
-    )
+    return <Skeleton className="size-10 bg-zinc-400/40 rounded-full" />
   }
 
   return (
