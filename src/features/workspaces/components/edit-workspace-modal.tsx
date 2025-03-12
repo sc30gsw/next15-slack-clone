@@ -81,7 +81,9 @@ export const EditWorkspaceModal = ({
               maxLength={80}
               errorMessage=""
               defaultValue={
-                lastResult?.initialValue?.name.toString() ?? workspaceName
+                lastResult?.status !== 'error'
+                  ? (lastResult?.initialValue?.name.toString() ?? workspaceName)
+                  : ''
               }
             />
             <span id={fields.name.errorId} className="text-sm text-red-500">

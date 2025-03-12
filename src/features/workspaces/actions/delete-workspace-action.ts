@@ -2,15 +2,20 @@
 import { db } from '@/db/db'
 import { members, workspaces } from '@/db/schema'
 import { getSession } from '@/lib/auth/session'
+import type { SubmissionResult } from '@conform-to/react'
 import { and, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
-import { unauthorized } from 'next/navigation'
 
 export const deleteWorkspaceAction = async (workspaceId: string) => {
   const session = await getSession()
 
   if (!session?.user?.id) {
-    unauthorized()
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies SubmissionResult
   }
 
   const member = await db.query.members.findFirst({
@@ -21,7 +26,12 @@ export const deleteWorkspaceAction = async (workspaceId: string) => {
   })
 
   if (!member || member.role !== 'admin') {
-    unauthorized()
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies SubmissionResult
   }
 
   await db

@@ -8,7 +8,6 @@ import { getSession } from '@/lib/auth/session'
 import { generateJoinCode } from '@/utils/generate-join-code'
 import { parseWithZod } from '@conform-to/zod'
 import { revalidateTag } from 'next/cache'
-import { unauthorized } from 'next/navigation'
 
 export const createWorkspaceAction = async (_: unknown, formData: FormData) => {
   const submission = parseWithZod(formData, {
@@ -22,7 +21,12 @@ export const createWorkspaceAction = async (_: unknown, formData: FormData) => {
   const session = await getSession()
 
   if (!session?.user?.id) {
-    unauthorized()
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies ReturnType<typeof submission.reply>
   }
 
   const [newWorkspaceId] = await db

@@ -8,7 +8,6 @@ import { getSession } from '@/lib/auth/session'
 import { parseWithZod } from '@conform-to/zod'
 import { and, eq } from 'drizzle-orm'
 import { revalidateTag } from 'next/cache'
-import { unauthorized } from 'next/navigation'
 
 export const createChannelAction = async (_: unknown, formData: FormData) => {
   const submission = parseWithZod(formData, {
@@ -22,7 +21,12 @@ export const createChannelAction = async (_: unknown, formData: FormData) => {
   const session = await getSession()
 
   if (!session?.user?.id) {
-    unauthorized()
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies ReturnType<typeof submission.reply>
   }
 
   const member = await db.query.members.findFirst({
@@ -33,12 +37,17 @@ export const createChannelAction = async (_: unknown, formData: FormData) => {
   })
 
   if (!member || member.role !== 'admin') {
-    unauthorized()
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies ReturnType<typeof submission.reply>
   }
 
   const parsedName = submission.value.name.replace(/\s+/g, '-').toLowerCase()
 
-  await db
+  const [newChannelId] = await db
     .insert(channels)
     .values({
       name: parsedName,
@@ -48,5 +57,10 @@ export const createChannelAction = async (_: unknown, formData: FormData) => {
 
   revalidateTag(`${getChannelsCacheKey}/${submission.value.workspaceId}`)
 
-  return submission.reply()
+  return {
+    status: 'success',
+    initialValue: {
+      name: newChannelId.id,
+    },
+  } as const satisfies ReturnType<typeof submission.reply>
 }

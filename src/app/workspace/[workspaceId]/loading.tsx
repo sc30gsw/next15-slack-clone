@@ -1,11 +1,11 @@
 import { Loader } from '@/components/justd/ui'
 
-const SidebarIdLoading = () => {
+const WorkspaceIdLoading = () => {
   return (
-    <div className="min-h-dvh min-w-dvw flex items-center justify-center">
-      <Loader size="extra-large" />
+    <div className="h-full flex items-center justify-center flex-col gap-y-2">
+      <Loader size="medium" intent="secondary" />
     </div>
   )
 }
 
-export default SidebarIdLoading
+export default WorkspaceIdLoading

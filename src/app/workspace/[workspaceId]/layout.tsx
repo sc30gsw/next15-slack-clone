@@ -27,7 +27,6 @@ const WorkspaceIdLayout = ({
           <Panel minSize={20}>{children}</Panel>
         </PanelGroup>
       </section>
-      {/* <CreateWorkSpaceModal /> */}
     </div>
   )
 }

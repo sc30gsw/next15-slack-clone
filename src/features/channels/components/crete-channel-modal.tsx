@@ -11,20 +11,27 @@ import { useSafeForm } from '@/hooks/use-safe-form'
 import { withCallbacks } from '@/utils/with-callbacks'
 import { getFormProps, getInputProps, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useActionState } from 'react'
 import { toast } from 'sonner'
 
 export const CreateChannelModal = () => {
   const params = useParams<Record<'workspaceId', string>>()
+  const router = useRouter()
 
   const [open, setOpen] = useCreteChannelModal()
 
   const [lastResult, action, isPending] = useActionState(
     withCallbacks(createChannelAction, {
-      onSuccess() {
-        setOpen(false)
+      onSuccess(result) {
         toast.success('Channel created')
+        setOpen(false)
+        router.replace(
+          `/workspace/${params.workspaceId}/channel/${result.initialValue?.name}`,
+        )
+      },
+      onError() {
+        toast.error('Failed to create channel')
       },
     }),
     null,

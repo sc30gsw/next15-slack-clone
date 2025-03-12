@@ -7,9 +7,10 @@ import {
 import { db } from '@/db/db'
 import { members, workspaces } from '@/db/schema'
 import { getSession } from '@/lib/auth/session'
+import type { SubmissionResult } from '@conform-to/react'
 import { and, eq } from 'drizzle-orm'
 import { revalidateTag } from 'next/cache'
-import { notFound, unauthorized } from 'next/navigation'
+import { unauthorized } from 'next/navigation'
 
 export const joinAction = async (workspaceId: string, joinCode: string) => {
   const session = await getSession()
@@ -23,7 +24,12 @@ export const joinAction = async (workspaceId: string, joinCode: string) => {
   })
 
   if (!workspace) {
-    notFound()
+    return {
+      status: 'error',
+      error: {
+        message: ['not found'],
+      },
+    } as const satisfies SubmissionResult
   }
 
   // if (workspace.joinCode !== joinCode) {
