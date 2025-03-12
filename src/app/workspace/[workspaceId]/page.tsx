@@ -3,6 +3,8 @@ import { WorkspaceIdPageClient } from '@/features/workspaces/components/workspac
 import { getSession } from '@/lib/auth/session'
 import { redirect } from 'next/navigation'
 
+export const experimental_ppr = true
+
 const WorkspaceIdPage = async ({
   params,
 }: { params: Promise<{ workspaceId: string }> }) => {
