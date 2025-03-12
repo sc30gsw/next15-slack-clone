@@ -23,8 +23,8 @@ export const CreateChannelModal = () => {
   const [lastResult, action, isPending] = useActionState(
     withCallbacks(createChannelAction, {
       onSuccess() {
-        setOpen(false)
         toast.success('Channel created')
+        setOpen(false)
       },
       onError() {
         toast.error('Failed to create channel')
