@@ -1,7 +1,7 @@
 import { db } from '@/db/db'
 import { members, workspaces } from '@/db/schema'
 import { sessionMiddleware } from '@/lib/auth/session-middleware'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 
 const app = new Hono().get('/workspace/:id', sessionMiddleware, async (c) => {
@@ -10,7 +10,7 @@ const app = new Hono().get('/workspace/:id', sessionMiddleware, async (c) => {
   const { id } = c.req.param()
 
   const memberPromise = db.query.members.findFirst({
-    where: eq(members.userId, user.id),
+    where: and(eq(members.workspaceId, id), eq(members.userId, user.id)),
   })
 
   const workspacePromise = db.query.workspaces.findFirst({
