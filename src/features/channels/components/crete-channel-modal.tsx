@@ -26,6 +26,9 @@ export const CreateChannelModal = () => {
         setOpen(false)
         toast.success('Channel created')
       },
+      onError() {
+        toast.error('Failed to create channel')
+      },
     }),
     null,
   )
