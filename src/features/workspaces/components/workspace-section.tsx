@@ -34,7 +34,7 @@ export const WorkspaceSection = ({
       <div className="flex items-center justify-between pr-3.5 pl-3 group">
         <div className="flex items-center">
           <Button
-            intent="transparent"
+            intent="plain"
             className="p-0.5 text-sm size-6 text-[#f9edffcc] shrink-0 hover:bg-neutral-200/20 data-hovered:bg-neutral-200/20 data-pressed:bg-neutral-200/20"
             onPress={toggle}
           >
@@ -44,9 +44,10 @@ export const WorkspaceSection = ({
             />
           </Button>
           <Button
-            intent="transparent"
+            intent="plain"
             size="small"
             className="group px-1.5 text-sm text-[#f9edffcc] h-7 justify-start items-center overflow-hidden hover:bg-neutral-200/20 data-hovered:bg-neutral-200/20 data-pressed:bg-neutral-200/20"
+            onPress={toggle}
           >
             <span className="truncate">{label}</span>
           </Button>

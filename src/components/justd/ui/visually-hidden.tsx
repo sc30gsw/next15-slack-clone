@@ -1,10 +1,9 @@
-'use client'
+"use client"
 
-import type { ReactNode } from 'react'
-import { useVisuallyHidden } from 'react-aria'
+import { useVisuallyHidden } from "react-aria"
 
 type VisuallyHiddenSpanProps = {
-  children: ReactNode
+  children: React.ReactNode
 }
 
 const VisuallyHidden = ({ children }: VisuallyHiddenSpanProps) => {

@@ -21,7 +21,11 @@ export const WorkspaceHeaderContainer = async ({
   })
 
   return (
-    <WorkspaceHeader workspaceName={workspace.name} isAdmin={isAdmin}>
+    <WorkspaceHeader
+      workspaceName={workspace.name}
+      workspaceJoinCode={workspace.joinCode}
+      isAdmin={isAdmin}
+    >
       <div className="flex items-center gap-0.5">
         <Hint label="Search" placement="bottom" showArrow={false}>
           <div className="flex items-center bg-transparent hover:bg-neutral-200/60 outline-none border-none font-semibold text-white text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-200/60 data-pressed:bg-neutral-200/60 size-9 shrink-0 rounded-md cursor-pointer">

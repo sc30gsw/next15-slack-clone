@@ -39,7 +39,7 @@ export const Toolbar = async ({ workspaceId }: ToolbarProps) => {
       <div className="ml-auto flex-1 flex items-center justify-end">
         <Button
           size="square-petite"
-          appearance="plain"
+          intent="plain"
           className="bg-transparent hover:bg-accent/10 text-white data-hovered:bg-accent/10 data-pressed:bg-accent/10"
         >
           <IconCircleInfo className="size-5" />

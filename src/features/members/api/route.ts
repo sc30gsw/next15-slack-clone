@@ -34,6 +34,7 @@ const app = new Hono()
     const workspaceMembers = await db.query.members.findMany({
       where: eq(members.workspaceId, c.req.param('workspaceId')),
       with: { user: true },
+      orderBy: (members, { desc }) => [desc(members.createdAt)],
     })
 
     return c.json({ members: workspaceMembers }, 200)

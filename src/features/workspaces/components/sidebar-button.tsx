@@ -30,8 +30,7 @@ export const SidebarButton = ({ icon, label }: SidebarButtonProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-y-0.5 cursor-pointer group">
       <Button
-        intent="secondary"
-        appearance="outline"
+        intent="plain"
         size="square-petite"
         className={cn(
           'size-9 p-2 text-white bg-transparent group-hover:bg-neutral-200/20 data-hovered:bg-neutral-200/20 data-pressed:bg-neutral-200/20 outline-none border-none',

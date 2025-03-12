@@ -1,6 +1,7 @@
 'use client'
 
 import { Menu } from '@/components/justd/ui'
+import { InviteModal } from '@/features/workspaces/components/invite-modal'
 import { PreferencesModal } from '@/features/workspaces/components/preferences-modal'
 import type { Workspace } from '@/features/workspaces/types'
 import { IconChevronDown } from 'justd-icons'
@@ -8,22 +9,31 @@ import { type ReactNode, useState } from 'react'
 
 type WorkspaceHeaderProps = {
   workspaceName: Workspace['name']
+  workspaceJoinCode: Workspace['joinCode']
   isAdmin: boolean
   children: ReactNode
 }
 
 export const WorkspaceHeader = ({
   workspaceName,
+  workspaceJoinCode,
   isAdmin,
   children,
 }: WorkspaceHeaderProps) => {
-  const [open, setOpen] = useState(false)
+  const [preferencesOpen, setPreferencesOpen] = useState(false)
+  const [inviteOpen, setInviteOpen] = useState(false)
 
   return (
     <>
+      <InviteModal
+        open={inviteOpen}
+        setOpen={setInviteOpen}
+        workspaceName={workspaceName}
+        workspaceJoinCode={workspaceJoinCode}
+      />
       <PreferencesModal
-        open={open}
-        setOpen={setOpen}
+        open={preferencesOpen}
+        setOpen={setPreferencesOpen}
         workspaceName={workspaceName}
       />
       <div className="flex items-center justify-between px-4 h-[49px] gap-0.5">
@@ -47,12 +57,15 @@ export const WorkspaceHeader = ({
             {isAdmin && (
               <>
                 <Menu.Separator />
-                <Menu.Item className="cursor-pointer py-2">
+                <Menu.Item
+                  onAction={() => setInviteOpen(true)}
+                  className="cursor-pointer py-2"
+                >
                   Invite people to {workspaceName}
                 </Menu.Item>
                 <Menu.Separator />
                 <Menu.Item
-                  onAction={() => setOpen(true)}
+                  onAction={() => setPreferencesOpen(true)}
                   className="cursor-pointer py-2"
                 >
                   Preference

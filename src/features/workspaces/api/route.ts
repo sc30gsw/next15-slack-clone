@@ -3,6 +3,7 @@ import { members, workspaces } from '@/db/schema'
 import { sessionMiddleware } from '@/lib/auth/session-middleware'
 import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
+import { filter, isIncludedIn, map, pipe } from 'remeda'
 
 const app = new Hono()
   .get('/', sessionMiddleware, async (c) => {
@@ -28,13 +29,21 @@ const app = new Hono()
 
     const workspace = await db.query.workspaces.findFirst({
       where: eq(workspaces.id, id),
+      with: { members: true },
     })
 
     if (!workspace) {
       return c.json({ error: { message: 'Workspace not found' } }, 404)
     }
 
-    if (user.id !== workspace.userId) {
+    const isMember = pipe(
+      workspace.members,
+      map((member) => member.userId),
+      filter((userId) => typeof userId === 'string'),
+      (userIds) => isIncludedIn(user.id, userIds),
+    )
+
+    if (!isMember) {
       return c.json({ error: { message: 'Forbidden' } }, 403)
     }
 

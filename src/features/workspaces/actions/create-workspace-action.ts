@@ -5,21 +5,10 @@ import { db } from '@/db/db'
 import { channels, members, workspaces } from '@/db/schema'
 import { createWorkspaceInputSchema } from '@/features/workspaces/types/schemas/create-workspace-input-schema'
 import { getSession } from '@/lib/auth/session'
+import { generateJoinCode } from '@/utils/generate-join-code'
 import { parseWithZod } from '@conform-to/zod'
 import { revalidateTag } from 'next/cache'
 import { unauthorized } from 'next/navigation'
-
-const generateCode = () => {
-  const code = Array.from(
-    { length: 6 },
-    () =>
-      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[
-        Math.floor(Math.random() * 62)
-      ],
-  ).join('')
-
-  return code
-}
 
 export const createWorkspaceAction = async (_: unknown, formData: FormData) => {
   const submission = parseWithZod(formData, {
@@ -40,7 +29,7 @@ export const createWorkspaceAction = async (_: unknown, formData: FormData) => {
     .insert(workspaces)
     .values({
       name: submission.value.name,
-      joinCode: generateCode(),
+      joinCode: generateJoinCode(),
       userId: session.user.id,
     })
     .returning({ id: workspaces.id })
