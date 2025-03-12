@@ -1,6 +1,6 @@
 import { Button } from '@/components/justd/ui'
 import Link from 'next/link'
-import type { FC, SVGProps } from 'react'
+import type { FC, JSX, SVGProps } from 'react'
 import { type VariantProps, tv } from 'tailwind-variants'
 
 const sidebarItemStyle = tv({
@@ -29,7 +29,8 @@ type SidebarItemProps = {
   workspaceId: string
   id: string
   label: string
-  icon: FC<SVGProps<SVGSVGElement>>
+  icon?: FC<SVGProps<SVGSVGElement>>
+  channelIcon?: JSX.Element
 } & VariantProps<typeof sidebarItemStyle>
 
 export const SidebarItem = ({
@@ -37,13 +38,16 @@ export const SidebarItem = ({
   id,
   label,
   icon: Icon,
+  channelIcon,
   variant,
 }: SidebarItemProps) => {
   const { base, link } = sidebarItemStyle({ variant })
+
   return (
     <Button intent="plain" size="small" className={base()}>
       <Link href={`/workspace/${workspaceId}/channel/${id}`} className={link()}>
-        <Icon className="size-3.5 mr-1 shrink-0" />
+        {Icon && <Icon className="size-3.5 mr-1 shrink-0" />}
+        {channelIcon && channelIcon}
         <span className="text-sm truncate">{label}</span>
       </Link>
     </Button>

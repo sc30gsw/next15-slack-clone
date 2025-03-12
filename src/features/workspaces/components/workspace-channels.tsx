@@ -1,5 +1,5 @@
 import { getChannels } from '@/features/channels/server/fetcher'
-import { SidebarItem } from '@/features/workspaces/components/sidebar-item'
+import { WorkspaceChannelItem } from '@/features/workspaces/components/workspace-channel-item'
 import { getSession } from '@/lib/auth/session'
 import { IconHashtag } from 'justd-icons'
 
@@ -17,12 +17,12 @@ export const WorkspaceChannels = async ({
   })
 
   return channels.map((channel) => (
-    <SidebarItem
+    <WorkspaceChannelItem
       key={channel.id}
       id={channel.id}
-      label={channel.name}
-      icon={IconHashtag}
+      name={channel.name}
       workspaceId={workspaceId}
+      icon={<IconHashtag className="size-3.5 mr-1 shrink-0" />}
     />
   ))
 }
