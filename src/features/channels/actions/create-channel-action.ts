@@ -47,7 +47,7 @@ export const createChannelAction = async (_: unknown, formData: FormData) => {
 
   const parsedName = submission.value.name.replace(/\s+/g, '-').toLowerCase()
 
-  await db
+  const [newChannelId] = await db
     .insert(channels)
     .values({
       name: parsedName,
@@ -57,5 +57,10 @@ export const createChannelAction = async (_: unknown, formData: FormData) => {
 
   revalidateTag(`${getChannelsCacheKey}/${submission.value.workspaceId}`)
 
-  return submission.reply()
+  return {
+    status: 'success',
+    initialValue: {
+      name: newChannelId.id,
+    },
+  } as const satisfies ReturnType<typeof submission.reply>
 }
