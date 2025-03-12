@@ -5,15 +5,20 @@ import { db } from '@/db/db'
 import { members, workspaces } from '@/db/schema'
 import { getSession } from '@/lib/auth/session'
 import { generateJoinCode } from '@/utils/generate-join-code'
+import type { SubmissionResult } from '@conform-to/react'
 import { and, eq } from 'drizzle-orm'
 import { revalidateTag } from 'next/cache'
-import { unauthorized } from 'next/navigation'
 
 export const newJoinCodeAction = async (workspaceId: string) => {
   const session = await getSession()
 
   if (!session?.user?.id) {
-    unauthorized()
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies SubmissionResult
   }
 
   const member = await db.query.members.findFirst({
@@ -24,7 +29,12 @@ export const newJoinCodeAction = async (workspaceId: string) => {
   })
 
   if (!member || member.role !== 'admin') {
-    unauthorized()
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies SubmissionResult
   }
 
   const joinCode = generateJoinCode()
