@@ -6,18 +6,17 @@ import { useCreteChannelModal } from '@/features/channels/hooks/use-create-chann
 import {
   type CreateChannelInput,
   createChannelInputSchema,
-} from '@/features/channels/types/schemas/create-channel-schema'
+} from '@/features/channels/types/schemas/create-channel-input-schema'
 import { useSafeForm } from '@/hooks/use-safe-form'
 import { withCallbacks } from '@/utils/with-callbacks'
 import { getFormProps, getInputProps, useInputControl } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { useActionState } from 'react'
 import { toast } from 'sonner'
 
 export const CreateChannelModal = () => {
   const params = useParams<Record<'workspaceId', string>>()
-  const router = useRouter()
 
   const [open, setOpen] = useCreteChannelModal()
 
@@ -26,7 +25,7 @@ export const CreateChannelModal = () => {
       onSuccess(result) {
         toast.success('Channel created')
         setOpen(false)
-        router.replace(
+        location.replace(
           `/workspace/${params.workspaceId}/channel/${result.initialValue?.name}`,
         )
       },
