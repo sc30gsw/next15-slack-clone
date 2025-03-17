@@ -1,21 +1,27 @@
-"use client"
+'use client'
 
-import { useState } from "react"
+import { useState } from 'react'
 
-import type { TextInputDOMProps } from "@react-types/shared"
-import { IconEye, IconEyeClosed } from "justd-icons"
+import type { TextInputDOMProps } from '@react-types/shared'
+import { IconEye, IconEyeClosed } from 'justd-icons'
 import {
   Button as ButtonPrimitive,
   TextField as TextFieldPrimitive,
   type TextFieldProps as TextFieldPrimitiveProps,
-} from "react-aria-components"
+} from 'react-aria-components'
 
-import type { FieldProps } from "./field"
-import { Description, FieldError, FieldGroup, Input, Label } from "./field"
-import { Loader } from "./loader"
-import { composeTailwindRenderProps } from "./primitive"
+import type { FieldProps } from '@/components/justd/ui/field'
+import {
+  Description,
+  FieldError,
+  FieldGroup,
+  Input,
+  Label,
+} from '@/components/justd/ui/field'
+import { Loader } from '@/components/justd/ui/loader'
+import { composeTailwindRenderProps } from '@/components/justd/ui/primitive'
 
-type InputType = Exclude<TextInputDOMProps["type"], "password">
+type InputType = Exclude<TextInputDOMProps['type'], 'password'>
 
 interface BaseTextFieldProps extends TextFieldPrimitiveProps, FieldProps {
   prefix?: React.ReactNode
@@ -26,7 +32,7 @@ interface BaseTextFieldProps extends TextFieldPrimitiveProps, FieldProps {
 
 interface RevealableTextFieldProps extends BaseTextFieldProps {
   isRevealable: true
-  type: "password"
+  type: 'password'
 }
 
 interface NonRevealableTextFieldProps extends BaseTextFieldProps {
@@ -50,7 +56,11 @@ const TextField = ({
   ...props
 }: TextFieldProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const inputType = isRevealable ? (isPasswordVisible ? "text" : "password") : type
+  const inputType = isRevealable
+    ? isPasswordVisible
+      ? 'text'
+      : 'password'
+    : type
   const handleTogglePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev)
   }
@@ -58,17 +68,22 @@ const TextField = ({
     <TextFieldPrimitive
       type={inputType}
       {...props}
-      className={composeTailwindRenderProps(className, "group flex flex-col gap-y-1")}
+      className={composeTailwindRenderProps(
+        className,
+        'group flex flex-col gap-y-1',
+      )}
     >
-      {!props.children ? (
+      {props.children ? (
+        props.children
+      ) : (
         <>
           {label && <Label>{label}</Label>}
           <FieldGroup
             isDisabled={props.isDisabled}
             isInvalid={!!errorMessage}
-            data-loading={isPending ? "true" : undefined}
+            data-loading={isPending ? 'true' : undefined}
           >
-            {prefix && typeof prefix === "string" ? (
+            {prefix && typeof prefix === 'string' ? (
               <span className="ml-2 text-muted-fg">{prefix}</span>
             ) : (
               prefix
@@ -86,7 +101,7 @@ const TextField = ({
             ) : isPending ? (
               <Loader variant="spin" />
             ) : suffix ? (
-              typeof suffix === "string" ? (
+              typeof suffix === 'string' ? (
                 <span className="mr-2 text-muted-fg">{suffix}</span>
               ) : (
                 suffix
@@ -96,8 +111,6 @@ const TextField = ({
           {description && <Description>{description}</Description>}
           <FieldError>{errorMessage}</FieldError>
         </>
-      ) : (
-        props.children
       )}
     </TextFieldPrimitive>
   )

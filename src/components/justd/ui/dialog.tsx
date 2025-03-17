@@ -1,31 +1,37 @@
-"use client"
+'use client'
 
-import { useEffect, useRef } from "react"
+import {
+  type ComponentProps,
+  type HTMLAttributes,
+  type Ref,
+  useEffect,
+  useRef,
+} from 'react'
 
-import { IconX } from "justd-icons"
-import type { HeadingProps } from "react-aria-components"
+import { IconX } from 'justd-icons'
+import type { HeadingProps } from 'react-aria-components'
 import {
   Button as ButtonPrimitive,
   Dialog as DialogPrimitive,
   Heading,
   Text,
-} from "react-aria-components"
-import { tv } from "tailwind-variants"
+} from 'react-aria-components'
+import { tv } from 'tailwind-variants'
 
-import { cn } from "@/utils/classes"
-import { useMediaQuery } from "@/utils/use-media-query"
-import { Button, type ButtonProps } from "./button"
+import { Button, type ButtonProps } from '@/components/justd/ui/button'
+import { cn } from '@/utils/classes'
+import { useMediaQuery } from '@/utils/use-media-query'
 
 const Dialog = ({
-  role = "dialog",
+  role = 'dialog',
   className,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive>) => {
+}: ComponentProps<typeof DialogPrimitive>) => {
   return (
     <DialogPrimitive
       role={role}
       className={cn(
-        "peer/dialog group/dialog relative flex max-h-[inherit] flex-col overflow-hidden outline-hidden [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5",
+        'peer/dialog group/dialog relative flex max-h-[inherit] flex-col overflow-hidden outline-hidden [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5',
         className,
       )}
       {...props}
@@ -33,11 +39,11 @@ const Dialog = ({
   )
 }
 
-const Trigger = (props: React.ComponentProps<typeof ButtonPrimitive>) => (
+const Trigger = (props: ComponentProps<typeof ButtonPrimitive>) => (
   <ButtonPrimitive {...props} />
 )
 
-type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
+type DialogHeaderProps = HTMLAttributes<HTMLDivElement> & {
   title?: string
   description?: string
 }
@@ -54,7 +60,7 @@ const Header = ({ className, ...props }: DialogHeaderProps) => {
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         header.parentElement?.style.setProperty(
-          "--dialog-header-height",
+          '--dialog-header-height',
           `${entry.target.clientHeight}px`,
         )
       }
@@ -69,32 +75,36 @@ const Header = ({ className, ...props }: DialogHeaderProps) => {
       data-slot="dialog-header"
       ref={headerRef}
       className={cn(
-        "relative flex flex-col gap-0.5 p-4 sm:gap-1 sm:p-6 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-0",
+        'relative flex flex-col gap-0.5 p-4 sm:gap-1 sm:p-6 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-0',
         className,
       )}
     >
       {props.title && <Title>{props.title}</Title>}
       {props.description && <Description>{props.description}</Description>}
-      {!props.title && typeof props.children === "string" ? <Title {...props} /> : props.children}
+      {!props.title && typeof props.children === 'string' ? (
+        <Title {...props} />
+      ) : (
+        props.children
+      )}
     </div>
   )
 }
 
 const titleStyles = tv({
-  base: "flex flex-1 items-center text-fg",
+  base: 'flex flex-1 items-center text-fg',
   variants: {
     level: {
-      1: "font-semibold text-lg sm:text-xl",
-      2: "font-semibold text-lg sm:text-xl",
-      3: "font-semibold text-base sm:text-lg",
-      4: "font-semibold text-base",
+      1: 'font-semibold text-lg sm:text-xl',
+      2: 'font-semibold text-lg sm:text-xl',
+      3: 'font-semibold text-base sm:text-lg',
+      4: 'font-semibold text-base',
     },
   },
 })
 
-interface DialogTitleProps extends Omit<HeadingProps, "level"> {
+interface DialogTitleProps extends Omit<HeadingProps, 'level'> {
   level?: 1 | 2 | 3 | 4
-  ref?: React.Ref<HTMLHeadingElement>
+  ref?: Ref<HTMLHeadingElement>
 }
 const Title = ({ level = 2, className, ref, ...props }: DialogTitleProps) => (
   <Heading
@@ -106,30 +116,30 @@ const Title = ({ level = 2, className, ref, ...props }: DialogTitleProps) => (
   />
 )
 
-type DialogDescriptionProps = React.ComponentProps<"div">
+type DialogDescriptionProps = ComponentProps<'div'>
 const Description = ({ className, ref, ...props }: DialogDescriptionProps) => (
   <Text
     slot="description"
-    className={cn("text-muted-fg text-sm", className)}
+    className={cn('text-muted-fg text-sm', className)}
     ref={ref}
     {...props}
   />
 )
 
-type DialogBodyProps = React.ComponentProps<"div">
+type DialogBodyProps = ComponentProps<'div'>
 const Body = ({ className, ref, ...props }: DialogBodyProps) => (
   <div
     data-slot="dialog-body"
     ref={ref}
     className={cn(
-      "isolate flex max-h-[calc(var(--visual-viewport-height)-var(--visual-viewport-vertical-padding)-var(--dialog-header-height,0px)-var(--dialog-footer-height,0px))] flex-1 flex-col overflow-auto px-4 py-1 sm:px-6",
+      'isolate flex max-h-[calc(var(--visual-viewport-height)-var(--visual-viewport-vertical-padding)-var(--dialog-header-height,0px)-var(--dialog-footer-height,0px))] flex-1 flex-col overflow-auto px-4 py-1 sm:px-6',
       className,
     )}
     {...props}
   />
 )
 
-type DialogFooterProps = React.ComponentProps<"div">
+type DialogFooterProps = ComponentProps<'div'>
 const Footer = ({ className, ...props }: DialogFooterProps) => {
   const footerRef = useRef<HTMLDivElement>(null)
 
@@ -143,7 +153,7 @@ const Footer = ({ className, ...props }: DialogFooterProps) => {
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         footer.parentElement?.style.setProperty(
-          "--dialog-footer-height",
+          '--dialog-footer-height',
           `${entry.target.clientHeight}px`,
         )
       }
@@ -159,7 +169,7 @@ const Footer = ({ className, ...props }: DialogFooterProps) => {
       ref={footerRef}
       data-slot="dialog-footer"
       className={cn(
-        "isolate mt-auto flex flex-col-reverse justify-between gap-3 p-4 pt-3 sm:flex-row sm:p-6 sm:pt-5",
+        'isolate mt-auto flex flex-col-reverse justify-between gap-3 p-4 pt-3 sm:flex-row sm:p-6 sm:pt-5',
         className,
       )}
       {...props}
@@ -167,17 +177,30 @@ const Footer = ({ className, ...props }: DialogFooterProps) => {
   )
 }
 
-const Close = ({ className, intent = "outline", ref, ...props }: ButtonProps) => {
-  return <Button slot="close" className={className} ref={ref} intent={intent} {...props} />
+const Close = ({
+  className,
+  intent = 'outline',
+  ref,
+  ...props
+}: ButtonProps) => {
+  return (
+    <Button
+      slot="close"
+      className={className}
+      ref={ref}
+      intent={intent}
+      {...props}
+    />
+  )
 }
 
-interface CloseButtonIndicatorProps extends Omit<ButtonProps, "children"> {
+interface CloseButtonIndicatorProps extends Omit<ButtonProps, 'children'> {
   className?: string
   isDismissable?: boolean | undefined
 }
 
 const CloseIndicator = ({ className, ...props }: CloseButtonIndicatorProps) => {
-  const isMobile = useMediaQuery("(max-width: 600px)")
+  const isMobile = useMediaQuery('(max-width: 600px)')
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -192,7 +215,7 @@ const CloseIndicator = ({ className, ...props }: CloseButtonIndicatorProps) => {
       aria-label="Close"
       slot="close"
       className={cn(
-        "close absolute top-1 right-1 z-50 grid size-8 place-content-center rounded-xl hover:bg-secondary focus:bg-secondary focus:outline-hidden data-focus-visible:ring-1 data-focus-visible:ring-primary sm:top-2 sm:right-2 sm:size-7 sm:rounded-md",
+        'close absolute top-1 right-1 z-50 grid size-8 place-content-center rounded-xl hover:bg-secondary focus:bg-secondary focus:outline-hidden data-focus-visible:ring-1 data-focus-visible:ring-primary sm:top-2 sm:right-2 sm:size-7 sm:rounded-md',
         className,
       )}
     >

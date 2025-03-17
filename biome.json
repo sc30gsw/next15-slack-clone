@@ -78,8 +78,15 @@
       "include": ["src/components/justd/ui/*.tsx"],
       "linter": {
         "rules": {
+          "correctness": {
+            "noUndeclaredVariables": "off"
+          },
           "a11y": {
-            "noSvgWithoutTitle": "off"
+            "noSvgWithoutTitle": "off",
+            "useSemanticElements": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
           }
         }
       }
