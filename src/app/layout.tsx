@@ -29,12 +29,11 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="ja">
-      <head>
-        <script
-          src="https://unpkg.com/react-scan/dist/auto.global.js"
-          async={true}
-        />
-      </head>
+      {process.env.NODE_ENV === 'development' && (
+        <head>
+          <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        </head>
+      )}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
