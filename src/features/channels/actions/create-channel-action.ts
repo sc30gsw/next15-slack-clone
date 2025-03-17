@@ -3,7 +3,7 @@
 import { getChannelsCacheKey } from '@/constants/cache-keys'
 import { db } from '@/db/db'
 import { channels, members } from '@/db/schema'
-import { createChannelInputSchema } from '@/features/channels/types/schemas/create-channel-schema'
+import { createChannelInputSchema } from '@/features/channels/types/schemas/create-channel-input-schema'
 import { getSession } from '@/lib/auth/session'
 import { parseWithZod } from '@conform-to/zod'
 import { and, eq } from 'drizzle-orm'
