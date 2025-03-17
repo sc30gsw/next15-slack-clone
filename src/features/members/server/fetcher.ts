@@ -31,7 +31,7 @@ export const getWorkspaceCurrentMember = async (
     },
   })
 
-  return res
+  return res.member
 }
 
 export const getWorkspaceMembers = async (

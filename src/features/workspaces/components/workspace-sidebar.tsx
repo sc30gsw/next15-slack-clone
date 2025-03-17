@@ -22,12 +22,12 @@ export const WorkspaceSidebar = async ({
 }: WorkspaceSidebarProps) => {
   const session = await getSession()
 
-  const res = await getWorkspaceCurrentMember({
+  const member = await getWorkspaceCurrentMember({
     param: { workspaceId },
     userId: session?.user?.id,
   })
 
-  if (!res.member) {
+  if (!member) {
     return (
       <div className="flex flex-col bg-[#5E2C5F] h-full items-center justify-center">
         <IconTriangleExclamation className="size-5 text-white" />
@@ -47,7 +47,7 @@ export const WorkspaceSidebar = async ({
       >
         <WorkspaceHeaderContainer
           workspaceId={workspaceId}
-          isAdmin={res.member.role === 'admin'}
+          isAdmin={member.role === 'admin'}
         />
       </Suspense>
 
@@ -70,7 +70,7 @@ export const WorkspaceSidebar = async ({
         hint="New channel"
         isNew={true}
         modalKinds="channel"
-        isAdmin={res.member.role === 'admin'}
+        isAdmin={member.role === 'admin'}
       >
         <Suspense
           fallback={<Skeleton className="h-4 w-22 ml-4 bg-zinc-400/40" />}
@@ -83,7 +83,7 @@ export const WorkspaceSidebar = async ({
         hint="New direct message"
         isNew={true}
         modalKinds="dm"
-        isAdmin={res.member.role === 'admin'}
+        isAdmin={member.role === 'admin'}
       >
         <Suspense
           fallback={
