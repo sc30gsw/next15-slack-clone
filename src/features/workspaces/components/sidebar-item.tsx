@@ -45,7 +45,11 @@ export const SidebarItem = ({
 
   return (
     <Button intent="plain" size="small" className={base()}>
-      <Link href={`/workspace/${workspaceId}/channel/${id}`} className={link()}>
+      <Link
+        href={`/workspace/${workspaceId}/channel/${id}`}
+        className={link()}
+        prefetch={true}
+      >
         {Icon && <Icon className="size-3.5 mr-1 shrink-0" />}
         {channelIcon && channelIcon}
         <span className="text-sm truncate">{label}</span>

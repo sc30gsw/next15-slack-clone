@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
     ppr: 'incremental',
     useCache: true,
     authInterrupts: true,
+    staleTimes: {
+      dynamic: 60,
+      static: 300,
+    },
   },
 }
 

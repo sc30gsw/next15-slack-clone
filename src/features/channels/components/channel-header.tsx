@@ -4,9 +4,9 @@ import { getWorkspaceCurrentMember } from '@/features/members/server/fetcher'
 import { getSession } from '@/lib/auth/session'
 
 export const ChannelHeader = async ({
-  params,
-}: Record<'params', Promise<Record<'workspaceId' | 'channelId', string>>>) => {
-  const { workspaceId, channelId } = await params
+  workspaceId,
+  channelId,
+}: Record<'workspaceId' | 'channelId', string>) => {
   const session = await getSession()
 
   const channel = await getChannel({
