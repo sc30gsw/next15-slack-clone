@@ -1,6 +1,6 @@
 'use client'
 
-import { Editor } from '@/features/channels/components/editor'
+import { Editor } from '@/components/ui/editor'
 import type Quill from 'quill'
 import { useRef } from 'react'
 
