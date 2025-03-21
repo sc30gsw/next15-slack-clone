@@ -1,5 +1,6 @@
 import 'quill/dist/quill.snow.css'
 import { Button } from '@/components/justd/ui'
+import { EmojiPopover } from '@/components/ui/emoji-popover'
 import { Hint } from '@/components/ui/hint'
 import {
   type CreateMessageInput,
@@ -161,6 +162,15 @@ export const Editor = ({
     }
   }
 
+  const onEmojiSelect = (
+    emoji: Record<'id' | 'name' | 'native' | 'shortcodes' | 'unified', string> &
+      Record<'keywords', string[]>,
+  ) => {
+    const quill = quillRef.current
+
+    quill?.insertText(quill?.getSelection()?.index ?? 0, emoji.native)
+  }
+
   const isEmpty = text.replace(/<(.|\n)*?>/g, '').trim().length === 0
 
   return (
@@ -178,11 +188,11 @@ export const Editor = ({
               <IconLetterCase stroke={2} />
             </div>
           </Hint>
-          <Hint label="Emoji" showArrow={false} disabled={disabled}>
+          <EmojiPopover onEmojiSelect={onEmojiSelect}>
             <div className="bg-transparent hover:bg-neutral-300/60 outline-none border-none font-semibold text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-300/60 data-pressed:bg-neutral-300/60 size-9 shrink-0 rounded-md cursor-pointer">
               <IconMoodSmile stroke={2} />
             </div>
-          </Hint>
+          </EmojiPopover>
           {variant === 'create' && (
             <Hint label="Image" showArrow={false} disabled={disabled}>
               <div className="bg-transparent hover:bg-neutral-300/60 outline-none border-none font-semibold text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-300/60 data-pressed:bg-neutral-300/60 size-9 shrink-0 rounded-md cursor-pointer">
