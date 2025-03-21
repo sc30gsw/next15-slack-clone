@@ -1,6 +1,7 @@
 'use client'
 
 import { Tooltip } from '@/components/justd/ui'
+import { cn } from '@/utils/classes'
 import type { ComponentProps, ReactNode } from 'react'
 
 type HintProps = {
@@ -10,6 +11,7 @@ type HintProps = {
   placement?: ComponentProps<typeof Tooltip.Content>['placement']
   showArrow?: ComponentProps<typeof Tooltip.Content>['showArrow']
   onPress?: () => void
+  className?: string
 }
 
 export const Hint = ({
@@ -19,6 +21,7 @@ export const Hint = ({
   placement,
   showArrow,
   onPress,
+  className,
 }: HintProps) => {
   return (
     <Tooltip delay={50}>
@@ -28,7 +31,7 @@ export const Hint = ({
       <Tooltip.Content
         placement={placement}
         showArrow={showArrow}
-        className="bg-black text-white border border-white/5"
+        className={cn('bg-black text-white border border-white/5', className)}
       >
         <p className="font-medium text-xs">{label}</p>
       </Tooltip.Content>
