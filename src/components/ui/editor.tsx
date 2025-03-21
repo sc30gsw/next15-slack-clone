@@ -10,7 +10,8 @@ import { useSafeForm } from '@/hooks/use-safe-form'
 import { cn } from '@/utils/classes'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { IconLetterCase, IconMoodSmile, IconPhoto } from '@tabler/icons-react'
-import { IconSend2 } from 'justd-icons'
+import { IconSend2, IconX } from 'justd-icons'
+import Image from 'next/image'
 import type { Delta, Op, QuillOptions } from 'quill'
 import Quill from 'quill'
 import {
@@ -47,6 +48,7 @@ export const Editor = ({
   variant = 'create',
 }: EditorProps) => {
   const [text, setText] = useState('')
+  const [image, setImage] = useState<File | null>(null)
   const [isToolbarVisible, setIsToolbarVisible] = useState(true)
 
   const [lastResult, action, isPending] = useActionState(
@@ -71,6 +73,7 @@ export const Editor = ({
   const quillRef = useRef<Quill | null>(null)
   const defaultValueRef = useRef(defaultValue)
   const disabledRef = useRef(disabled)
+  const imageElementRef = useRef<HTMLInputElement>(null)
 
   useLayoutEffect(() => {
     submitRef.current = onSubmit
@@ -175,8 +178,45 @@ export const Editor = ({
 
   return (
     <div className="flex flex-col">
+      <input
+        ref={imageElementRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+        className="hidden"
+      />
       <div className="flex flex-col border border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white">
         <div ref={containerRef} className="h-full ql-custom" />
+        {image && (
+          <div className="p-2">
+            <div className="relative size-15.5 flex items-center justify-center group/image">
+              <Hint
+                label="Remove image"
+                showArrow={false}
+                disabled={disabled}
+                // placement="top left"
+                onPress={() => {
+                  setImage(null)
+                  if (imageElementRef.current) {
+                    imageElementRef.current.value = ''
+                  }
+                }}
+                className="mb-8 ml-15"
+              >
+                <div className="hidden group-hover/image:flex rounded-full bg-black/70 hover:bg-black absolute -top-2.5 -right-2.5 text-white size-6 z-[4] border-2 border-white items-center justify-center cursor-pointer">
+                  <IconX className="size-3.5" />
+                </div>
+              </Hint>
+              <Image
+                src={URL.createObjectURL(image)}
+                alt="Uploaded"
+                fill={true}
+                priority={true}
+                className="rounded-xl overflow-hidden border object-cover"
+              />
+            </div>
+          </div>
+        )}
         <div className="flex px-2 pb-2 z-5">
           <Hint
             label={isToolbarVisible ? 'Hide formatting' : 'Show formatting'}
@@ -194,7 +234,12 @@ export const Editor = ({
             </div>
           </EmojiPopover>
           {variant === 'create' && (
-            <Hint label="Image" showArrow={false} disabled={disabled}>
+            <Hint
+              label="Image"
+              showArrow={false}
+              disabled={disabled}
+              onPress={() => imageElementRef.current?.click()}
+            >
               <div className="bg-transparent hover:bg-neutral-300/60 outline-none border-none font-semibold text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-300/60 data-pressed:bg-neutral-300/60 size-9 shrink-0 rounded-md cursor-pointer">
                 <IconPhoto stroke={2} />
               </div>
