@@ -1,5 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
+  type AnySQLiteColumn,
   index,
   integer,
   primaryKey,
@@ -34,6 +35,7 @@ export const users = sqliteTable(
 export const usersRelations = relations(users, ({ many }) => ({
   workspaces: many(workspaces),
   members: many(members),
+  messages: many(messages),
 }))
 
 export type InsertUser = typeof users.$inferInsert
@@ -107,6 +109,7 @@ export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
   }),
   members: many(members),
   channels: many(channels),
+  messages: many(messages),
 }))
 
 export const members = sqliteTable(
@@ -168,9 +171,72 @@ export const channels = sqliteTable(
 export type InsertChannel = typeof channels.$inferInsert
 export type SelectChannel = typeof channels.$inferSelect
 
-export const channelsRelations = relations(channels, ({ one }) => ({
+export const channelsRelations = relations(channels, ({ one, many }) => ({
   workspace: one(workspaces, {
     fields: [channels.workspaceId],
     references: [workspaces.id],
+  }),
+  messages: many(messages),
+}))
+
+export const messages = sqliteTable(
+  'messages',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    body: text('body').notNull(),
+    image: text('image'),
+    channelId: text('channelId').references(() => channels.id, {
+      onDelete: 'cascade',
+    }),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    workspaceId: text('workspaceId')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    parentMessageId: text('parentMessageId').references(
+      (): AnySQLiteColumn => messages.id,
+      {
+        onDelete: 'cascade',
+      },
+    ),
+    // TODO: add conversationId
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (message) => [
+    index('message_channelId').on(message.channelId),
+    index('message_userId').on(message.userId),
+    index('message_workspaceId').on(message.workspaceId),
+    index('message_parentMessageId').on(message.parentMessageId),
+  ],
+)
+
+export type InsertMessage = typeof messages.$inferInsert
+export type SelectMessage = typeof messages.$inferSelect
+
+export const messagesRelations = relations(messages, ({ one, many }) => ({
+  channel: one(channels, {
+    fields: [messages.channelId],
+    references: [channels.id],
+  }),
+  user: one(users, {
+    fields: [messages.userId],
+    references: [users.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [messages.workspaceId],
+    references: [workspaces.id],
+  }),
+  parentMessage: one(messages, {
+    fields: [messages.parentMessageId],
+    references: [messages.id],
+  }),
+  threads: many(messages, {
+    relationName: 'thread',
   }),
 }))
