@@ -2,13 +2,9 @@ import 'quill/dist/quill.snow.css'
 import { Button } from '@/components/justd/ui'
 import { EmojiPopover } from '@/components/ui/emoji-popover'
 import { Hint } from '@/components/ui/hint'
-import {
-  type CreateMessageInput,
-  crateMessageInputSchema,
-} from '@/features/messages/types/schemas/create-message-input-schema'
-import { useSafeForm } from '@/hooks/use-safe-form'
+import {} from '@/features/messages/types/schemas/create-message-input-schema'
 import { cn } from '@/utils/classes'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import {} from '@conform-to/zod'
 import { IconLetterCase, IconMoodSmile, IconPhoto } from '@tabler/icons-react'
 import { IconSend2, IconX } from 'justd-icons'
 import Image from 'next/image'
@@ -16,7 +12,6 @@ import type { Delta, Op, QuillOptions } from 'quill'
 import Quill from 'quill'
 import {
   type RefObject,
-  useActionState,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -50,22 +45,6 @@ export const Editor = ({
   const [text, setText] = useState('')
   const [image, setImage] = useState<File | null>(null)
   const [isToolbarVisible, setIsToolbarVisible] = useState(true)
-
-  const [lastResult, action, isPending] = useActionState(
-    () => Promise.resolve({}),
-    null,
-  )
-
-  const [form, fields] = useSafeForm<CreateMessageInput>({
-    constraint: getZodConstraint(crateMessageInputSchema),
-    lastResult,
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: crateMessageInputSchema })
-    },
-    defaultValue: {
-      text: '',
-    },
-  })
 
   const containerRef = useRef<HTMLDivElement>(null)
   const submitRef = useRef(onSubmit)
@@ -106,7 +85,24 @@ export const Editor = ({
             enter: {
               key: 'Enter',
               handler: () => {
-                // TODO: Submit form
+                const text = quill.getText()
+                const addedImage = imageElementRef.current?.files?.[0] ?? null
+
+                const isEmpty =
+                  !addedImage &&
+                  text.replace(/<(.|\n)*?>/g, '').trim().length === 0
+
+                if (isEmpty) {
+                  return
+                }
+
+                const body = JSON.stringify(quill.getContents())
+
+                submitRef.current({
+                  body,
+                  image: addedImage,
+                })
+
                 return
               },
             },
@@ -174,7 +170,7 @@ export const Editor = ({
     quill?.insertText(quill?.getSelection()?.index ?? 0, emoji.native)
   }
 
-  const isEmpty = text.replace(/<(.|\n)*?>/g, '').trim().length === 0
+  const isEmpty = !image && text.replace(/<(.|\n)*?>/g, '').trim().length === 0
 
   return (
     <div className="flex flex-col">
@@ -185,7 +181,12 @@ export const Editor = ({
         onChange={(e) => setImage(e.target.files?.[0] ?? null)}
         className="hidden"
       />
-      <div className="flex flex-col border border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white">
+      <div
+        className={cn(
+          'flex flex-col border border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white',
+          disabled && 'opacity-50',
+        )}
+      >
         <div ref={containerRef} className="h-full ql-custom" />
         {image && (
           <div className="p-2">
@@ -252,8 +253,14 @@ export const Editor = ({
                 Cancel
               </Button>
               <Button
-                size="small"
                 isDisabled={disabled || isEmpty}
+                size="small"
+                onPress={() => {
+                  onSubmit({
+                    body: JSON.stringify(quillRef.current?.getContents()),
+                    image,
+                  })
+                }}
                 className="bg-[#007a5a] hover:bg-[#007a5a]/80 data-hovered:bg-[#007a5a]/80 data-pressed:bg-[#007a5a]/80 text-white"
               >
                 Save
@@ -264,6 +271,12 @@ export const Editor = ({
             <Button
               isDisabled={disabled || isEmpty}
               size="square-petite"
+              onPress={() => {
+                onSubmit({
+                  body: JSON.stringify(quillRef.current?.getContents()),
+                  image,
+                })
+              }}
               className={cn(
                 'ml-auto',
                 isEmpty
