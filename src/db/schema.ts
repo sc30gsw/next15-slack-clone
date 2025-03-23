@@ -36,6 +36,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   workspaces: many(workspaces),
   members: many(members),
   messages: many(messages),
+  reactions: many(reactions),
 }))
 
 export type InsertUser = typeof users.$inferInsert
@@ -111,6 +112,7 @@ export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
   channels: many(channels),
   messages: many(messages),
   conversations: many(conversations),
+  reactions: many(reactions),
 }))
 
 export const members = sqliteTable(
@@ -218,6 +220,11 @@ export const messages = sqliteTable(
     index('message_workspaceId').on(message.workspaceId),
     index('message_parentMessageId').on(message.parentMessageId),
     index('message_conversationId').on(message.conversationId),
+    index('message_channelId_parentMessageId_conversationId').on(
+      message.channelId,
+      message.parentMessageId,
+      message.conversationId,
+    ),
   ],
 )
 
@@ -241,13 +248,14 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
     fields: [messages.parentMessageId],
     references: [messages.id],
   }),
-  threads: many(messages, {
-    relationName: 'thread',
-  }),
   conversation: one(conversations, {
     fields: [messages.conversationId],
     references: [conversations.id],
   }),
+  threads: many(messages, {
+    relationName: 'thread',
+  }),
+  reactions: many(reactions),
 }))
 
 export const conversations = sqliteTable(
@@ -303,3 +311,50 @@ export const conversationsRelations = relations(
     messages: many(messages),
   }),
 )
+
+export const reactions = sqliteTable(
+  'reactions',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    workspaceId: text('workspaceId')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    messageId: text('messageId').references(() => messages.id, {
+      onDelete: 'cascade',
+    }),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    value: text('value').notNull(),
+  },
+  (reaction) => [
+    index('reaction_workspaceId').on(reaction.workspaceId),
+    index('reaction_messageId').on(reaction.messageId),
+    index('reaction_userId').on(reaction.userId),
+    uniqueIndex('workspaceId_messageId_userId').on(
+      reaction.workspaceId,
+      reaction.messageId,
+      reaction.userId,
+    ),
+  ],
+)
+
+export type InsertReaction = typeof reactions.$inferInsert
+export type SelectReaction = typeof reactions.$inferSelect
+
+export const reactionsRelations = relations(reactions, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [reactions.workspaceId],
+    references: [workspaces.id],
+  }),
+  message: one(messages, {
+    fields: [reactions.messageId],
+    references: [messages.id],
+  }),
+  user: one(users, {
+    fields: [reactions.userId],
+    references: [users.id],
+  }),
+}))
