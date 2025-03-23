@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 const IMAGE_TYPES = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
-const MAX_IMAGE_SIZE = 5
+const MAX_IMAGE_SIZE = 4.5
 
 const sizeInMB = (sizeInBytes: number, decimalsNum = 2) => {
   const result = sizeInBytes / (1024 * 1024)
@@ -28,7 +28,7 @@ export const crateMessageInputSchema = z.object({
         return sizeInMB(file.size) <= MAX_IMAGE_SIZE
       },
       {
-        message: 'The file size must be up to 5MB',
+        message: 'The file size must be up to 4.5MB',
       },
     )
     .refine(

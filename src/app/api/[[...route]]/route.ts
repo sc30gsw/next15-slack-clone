@@ -1,6 +1,7 @@
 import channels from '@/features/channels/api/route'
 import join from '@/features/join/api/route'
 import members from '@/features/members/api/route'
+import upload from '@/features/upload/api/route'
 import workspaces from '@/features/workspaces/api/route'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
@@ -13,6 +14,7 @@ const route = app
   .route('/members', members)
   .route('/channels', channels)
   .route('/join', join)
+  .route('/upload', upload)
 
 export type AppType = typeof route
 
