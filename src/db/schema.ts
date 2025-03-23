@@ -245,6 +245,7 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
     references: [workspaces.id],
   }),
   parentMessage: one(messages, {
+    relationName: 'thread',
     fields: [messages.parentMessageId],
     references: [messages.id],
   }),
@@ -344,7 +345,7 @@ export const reactions = sqliteTable(
 export type InsertReaction = typeof reactions.$inferInsert
 export type SelectReaction = typeof reactions.$inferSelect
 
-export const reactionsRelations = relations(reactions, ({ one, many }) => ({
+export const reactionsRelations = relations(reactions, ({ one }) => ({
   workspace: one(workspaces, {
     fields: [reactions.workspaceId],
     references: [workspaces.id],
