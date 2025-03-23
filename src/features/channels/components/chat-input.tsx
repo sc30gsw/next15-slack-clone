@@ -22,6 +22,8 @@ export const ChatInput = ({ placeholder }: ChatInputProps) => {
     image,
   }: { body: string; image: File | null }) => {
     startTransition(async () => {
+      editorRef?.current?.enable(false)
+
       const result = await createMessageAction({
         body,
         image,
@@ -31,10 +33,12 @@ export const ChatInput = ({ placeholder }: ChatInputProps) => {
 
       if (result.status === 'error') {
         toast.error('Failed to send message')
+        return
       }
 
       toast.success('Message sent')
       setEditorKey((prev) => prev + 1)
+      editorRef?.current?.enable(true)
     })
   }
 
