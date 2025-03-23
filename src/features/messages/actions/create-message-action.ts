@@ -1,5 +1,6 @@
 'use server'
 
+import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { db } from '@/db/db'
 import { members, messages } from '@/db/schema'
 import {
@@ -10,6 +11,7 @@ import { getSession } from '@/lib/auth/session'
 import { client } from '@/lib/rpc'
 import { and, eq } from 'drizzle-orm'
 import type { InferResponseType } from 'hono'
+import { revalidateTag } from 'next/cache'
 
 export const createMessageAction = async (data: CreateMessageInput) => {
   const result = crateMessageInputSchema.safeParse(data)
@@ -85,7 +87,7 @@ export const createMessageAction = async (data: CreateMessageInput) => {
     imageUrl = null
   }
 
-  let conversationId = ''
+  let conversationId: string | null = null
 
   // Only possible if we are replying in a thread in 1:1 conversation
   if (!(data.conversationId || data.channelId) && data.parentMessageId) {
@@ -120,6 +122,8 @@ export const createMessageAction = async (data: CreateMessageInput) => {
       userId: session.user.id,
     })
     .returning({ id: messages.id })
+
+  revalidateTag(`${getChannelMessagesCacheKey}/${data.channelId}`)
 
   return {
     status: 'success',
