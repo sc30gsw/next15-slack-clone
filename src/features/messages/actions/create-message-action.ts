@@ -85,6 +85,28 @@ export const createMessageAction = async (data: CreateMessageInput) => {
     imageUrl = null
   }
 
+  let conversationId = ''
+
+  // Only possible if we are replying in a thread in 1:1 conversation
+  if (!(data.conversationId || data.channelId) && data.parentMessageId) {
+    const parentMessage = await db.query.messages.findFirst({
+      where: eq(messages.id, data.parentMessageId),
+    })
+
+    if (!parentMessage) {
+      return {
+        status: 'error',
+        error: {
+          message: ['Parent message not found'],
+        },
+      }
+    }
+
+    if (parentMessage.conversationId) {
+      conversationId = parentMessage.conversationId
+    }
+  }
+
   // ここでメッセージをデータベースに登録
   const [newMessagesId] = await db
     .insert(messages)
@@ -94,7 +116,7 @@ export const createMessageAction = async (data: CreateMessageInput) => {
       workspaceId: data.workspaceId,
       channelId: data.channelId,
       parentMessageId: data.parentMessageId,
-      // TODO: add conversationId
+      conversationId,
       userId: session.user.id,
     })
     .returning({ id: messages.id })

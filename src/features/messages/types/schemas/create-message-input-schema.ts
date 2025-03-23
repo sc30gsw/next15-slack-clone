@@ -47,6 +47,7 @@ export const crateMessageInputSchema = z.object({
   workspaceId: z.string({ required_error: 'Workspace ID is required' }),
   channelId: z.string().optional(),
   parentMessageId: z.string().optional(),
+  conversationId: z.string().optional(),
 })
 
 export type CreateMessageInput = z.infer<typeof crateMessageInputSchema>
