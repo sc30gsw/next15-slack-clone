@@ -149,6 +149,7 @@ export const membersRelations = relations(members, ({ one, many }) => ({
     references: [workspaces.id],
   }),
   conversations: many(conversations),
+  messages: many(messages),
 }))
 
 export const channels = sqliteTable(
@@ -210,7 +211,7 @@ export const messages = sqliteTable(
       onDelete: 'cascade',
     }),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
       () => new Date(),
     ),
   },
@@ -239,6 +240,10 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
   user: one(users, {
     fields: [messages.userId],
     references: [users.id],
+  }),
+  member: one(members, {
+    fields: [messages.userId, messages.workspaceId],
+    references: [members.userId, members.workspaceId],
   }),
   workspace: one(workspaces, {
     fields: [messages.workspaceId],
