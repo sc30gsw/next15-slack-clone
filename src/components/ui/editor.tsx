@@ -25,7 +25,6 @@ type EditorValue = {
 
 type EditorProps = {
   onSubmit: ({ image, body }: EditorValue) => void
-  onCancel?: () => void
   placeholder?: string
   defaultValue?: Delta | Op[]
   disabled?: boolean
@@ -34,7 +33,6 @@ type EditorProps = {
 }
 
 export const Editor = ({
-  onCancel,
   onSubmit,
   placeholder = 'Write something...',
   defaultValue = [],

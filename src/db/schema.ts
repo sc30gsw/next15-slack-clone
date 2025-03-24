@@ -36,6 +36,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   workspaces: many(workspaces),
   members: many(members),
   messages: many(messages),
+  reactions: many(reactions),
 }))
 
 export type InsertUser = typeof users.$inferInsert
@@ -110,6 +111,8 @@ export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
   members: many(members),
   channels: many(channels),
   messages: many(messages),
+  conversations: many(conversations),
+  reactions: many(reactions),
 }))
 
 export const members = sqliteTable(
@@ -136,7 +139,7 @@ export const members = sqliteTable(
 export type InsertMember = typeof members.$inferInsert
 export type SelectMember = typeof members.$inferSelect
 
-export const membersRelations = relations(members, ({ one }) => ({
+export const membersRelations = relations(members, ({ one, many }) => ({
   user: one(users, {
     fields: [members.userId],
     references: [users.id],
@@ -145,6 +148,8 @@ export const membersRelations = relations(members, ({ one }) => ({
     fields: [members.workspaceId],
     references: [workspaces.id],
   }),
+  conversations: many(conversations),
+  messages: many(messages),
 }))
 
 export const channels = sqliteTable(
@@ -202,9 +207,11 @@ export const messages = sqliteTable(
         onDelete: 'cascade',
       },
     ),
-    // TODO: add conversationId
+    conversationId: text('conversationId').references(() => conversations.id, {
+      onDelete: 'cascade',
+    }),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
       () => new Date(),
     ),
   },
@@ -213,6 +220,12 @@ export const messages = sqliteTable(
     index('message_userId').on(message.userId),
     index('message_workspaceId').on(message.workspaceId),
     index('message_parentMessageId').on(message.parentMessageId),
+    index('message_conversationId').on(message.conversationId),
+    index('message_channelId_parentMessageId_conversationId').on(
+      message.channelId,
+      message.parentMessageId,
+      message.conversationId,
+    ),
   ],
 )
 
@@ -228,15 +241,126 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
     fields: [messages.userId],
     references: [users.id],
   }),
+  member: one(members, {
+    fields: [messages.userId, messages.workspaceId],
+    references: [members.userId, members.workspaceId],
+  }),
   workspace: one(workspaces, {
     fields: [messages.workspaceId],
     references: [workspaces.id],
   }),
   parentMessage: one(messages, {
+    relationName: 'thread',
     fields: [messages.parentMessageId],
     references: [messages.id],
   }),
+  conversation: one(conversations, {
+    fields: [messages.conversationId],
+    references: [conversations.id],
+  }),
   threads: many(messages, {
     relationName: 'thread',
+  }),
+  reactions: many(reactions),
+}))
+
+export const conversations = sqliteTable(
+  'conversations',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    workspaceId: text('workspaceId')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    memberOneId: text('memberOneId').references(() => members.userId, {
+      onDelete: 'cascade',
+    }),
+    memberTwoId: text('memberTwoId').references(() => members.userId, {
+      onDelete: 'cascade',
+    }),
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (conversation) => [
+    index('conversation_workspaceId').on(conversation.workspaceId),
+    index('conversation_memberOneId').on(conversation.memberOneId),
+    index('conversation_memberTwoId').on(conversation.memberTwoId),
+    uniqueIndex('workspaceId_memberIds').on(
+      conversation.workspaceId,
+      conversation.memberOneId,
+      conversation.memberTwoId,
+    ),
+  ],
+)
+
+export type InsertConversation = typeof conversations.$inferInsert
+export type SelectConversation = typeof conversations.$inferSelect
+
+export const conversationsRelations = relations(
+  conversations,
+  ({ one, many }) => ({
+    workspace: one(workspaces, {
+      fields: [conversations.workspaceId],
+      references: [workspaces.id],
+    }),
+    memberOne: one(members, {
+      fields: [conversations.memberOneId],
+      references: [members.userId],
+    }),
+    memberTwo: one(members, {
+      fields: [conversations.memberTwoId],
+      references: [members.userId],
+    }),
+    messages: many(messages),
+  }),
+)
+
+export const reactions = sqliteTable(
+  'reactions',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    workspaceId: text('workspaceId')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    messageId: text('messageId').references(() => messages.id, {
+      onDelete: 'cascade',
+    }),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    value: text('value').notNull(),
+  },
+  (reaction) => [
+    index('reaction_workspaceId').on(reaction.workspaceId),
+    index('reaction_messageId').on(reaction.messageId),
+    index('reaction_userId').on(reaction.userId),
+    uniqueIndex('workspaceId_messageId_userId').on(
+      reaction.workspaceId,
+      reaction.messageId,
+      reaction.userId,
+    ),
+  ],
+)
+
+export type InsertReaction = typeof reactions.$inferInsert
+export type SelectReaction = typeof reactions.$inferSelect
+
+export const reactionsRelations = relations(reactions, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [reactions.workspaceId],
+    references: [workspaces.id],
+  }),
+  message: one(messages, {
+    fields: [reactions.messageId],
+    references: [messages.id],
+  }),
+  user: one(users, {
+    fields: [reactions.userId],
+    references: [users.id],
   }),
 }))

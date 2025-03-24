@@ -1,6 +1,7 @@
 import channels from '@/features/channels/api/route'
 import join from '@/features/join/api/route'
 import members from '@/features/members/api/route'
+import messages from '@/features/messages/api/route'
 import upload from '@/features/upload/api/route'
 import workspaces from '@/features/workspaces/api/route'
 import { Hono } from 'hono'
@@ -15,6 +16,7 @@ const route = app
   .route('/channels', channels)
   .route('/join', join)
   .route('/upload', upload)
+  .route('/messages', messages)
 
 export type AppType = typeof route
 
