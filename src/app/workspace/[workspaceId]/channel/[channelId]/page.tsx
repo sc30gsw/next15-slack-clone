@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/justd/ui'
 import { ChannelHeader } from '@/features/channels/components/channel-header'
 import { ChatInput } from '@/features/channels/components/chat-input'
 import { getChannel } from '@/features/channels/server/fetcher'
-import { MessageList } from '@/features/messages/components/message-lits'
+import { MessageList } from '@/features/messages/components/message-lilst'
 import { getSession } from '@/lib/auth/session'
 import { Suspense } from 'react'
 
