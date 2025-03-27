@@ -1,12 +1,9 @@
+import {
+  IMAGE_TYPES,
+  MAX_IMAGE_SIZE,
+  sizeInMB,
+} from '@/features/messages/utils/size-in-mb'
 import { z } from 'zod'
-
-const IMAGE_TYPES = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
-const MAX_IMAGE_SIZE = 4.5
-
-const sizeInMB = (sizeInBytes: number, decimalsNum = 2) => {
-  const result = sizeInBytes / (1024 * 1024)
-  return +result.toFixed(decimalsNum)
-}
 
 export const crateMessageInputSchema = z.object({
   body: z.string({ required_error: 'Body is required' }),

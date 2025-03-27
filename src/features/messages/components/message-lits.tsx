@@ -1,17 +1,33 @@
+import { Skeleton } from '@/components/justd/ui'
+import { ChannelHero } from '@/features/channels/components/channel-hero'
+import { getChannel } from '@/features/channels/server/fetcher'
 import { Message } from '@/features/messages/components/message'
 import { getChannelMessages } from '@/features/messages/server/fetcher'
 import { getSession } from '@/lib/auth/session'
 import { formatDateLabel } from '@/lib/date'
 import { differenceInMinutes, format } from 'date-fns'
+import { Suspense } from 'react'
 
 const TIME_THRESHOLD = 5
 
 type MessageListProps = {
+  workspaceId: string
   channelId: string
+  variant?: 'channel' | 'thread'
 }
 
-export const MessageList = async ({ channelId }: MessageListProps) => {
+export const MessageList = async ({
+  workspaceId,
+  channelId,
+  variant = 'channel',
+}: MessageListProps) => {
   const session = await getSession()
+
+  const channelPromise = getChannel({
+    param: { workspaceId, channelId },
+    userId: session?.user?.id,
+  })
+
   const messages = await getChannelMessages(
     {
       param: { channelId },
@@ -63,19 +79,42 @@ export const MessageList = async ({ channelId }: MessageListProps) => {
                 body={message.body}
                 image={message.image}
                 createdAt={message.createdAt}
-                updatedAt={message.updatedAt}
+                isUpdated={message.isUpdated}
                 threads={message.threads}
-                threadCount={message.threads.length}
                 reactions={message.reactions}
                 memberId={message.member.userId}
                 authorImage={message.user.image}
                 authorName={message.user.name}
+                isAuthor={message.userId === session?.user?.id}
                 isCompact={isCompact}
+                threadCount={message.threads.length}
+                hideThreadButton={variant === 'thread'}
               />
             )
           })}
         </div>
       ))}
+      {variant === 'channel' && (
+        <Suspense
+          fallback={
+            <div className="mt-22 mx-5 mb-4">
+              <Skeleton className="h-8 w-30 mb-2" />
+              <Skeleton className="h-6 w-4/5" />
+            </div>
+          }
+        >
+          {channelPromise.then(
+            (channel) =>
+              channel.name &&
+              channel.createdAt && (
+                <ChannelHero
+                  name={channel.name}
+                  creationTime={channel.createdAt}
+                />
+              ),
+          )}
+        </Suspense>
+      )}
     </div>
   )
 }

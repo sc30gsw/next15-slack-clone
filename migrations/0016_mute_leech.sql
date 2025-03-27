@@ -1,0 +1,1 @@
+ALTER TABLE `messages` ADD `isUpdated` integer DEFAULT 0;

@@ -109,26 +109,19 @@ export const createMessageAction = async (data: CreateMessageInput) => {
     }
   }
 
-  // ここでメッセージをデータベースに登録
-  const [newMessagesId] = await db
-    .insert(messages)
-    .values({
-      body: data.body,
-      image: imageUrl,
-      workspaceId: data.workspaceId,
-      channelId: data.channelId,
-      parentMessageId: data.parentMessageId,
-      conversationId,
-      userId: session.user.id,
-    })
-    .returning({ id: messages.id })
+  await db.insert(messages).values({
+    body: data.body,
+    image: imageUrl,
+    workspaceId: data.workspaceId,
+    channelId: data.channelId,
+    parentMessageId: data.parentMessageId,
+    conversationId,
+    userId: session.user.id,
+  })
 
   revalidateTag(`${getChannelMessagesCacheKey}/${data.channelId}`)
 
   return {
     status: 'success',
-    initialValue: {
-      body: newMessagesId.id,
-    },
   }
 }

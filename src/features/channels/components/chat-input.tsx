@@ -36,7 +36,6 @@ export const ChatInput = ({ placeholder }: ChatInputProps) => {
         return
       }
 
-      toast.success('Message sent')
       setEditorKey((prev) => prev + 1)
       editorRef?.current?.enable(true)
     })
