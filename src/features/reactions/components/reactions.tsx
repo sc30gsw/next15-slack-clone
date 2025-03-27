@@ -2,11 +2,14 @@
 
 import { EmojiPopover } from '@/components/ui/emoji-popover'
 import { Hint } from '@/components/ui/hint'
+import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
 import { IconMoodPlus } from '@tabler/icons-react'
+import { useQueryClient } from '@tanstack/react-query'
 import type { InferResponseType } from 'hono'
+import { useParams } from 'next/navigation'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
 
@@ -26,6 +29,9 @@ export const Reactions = ({
 }: ReactionsProps) => {
   const [isPending, startTransition] = useTransition()
 
+  const params = useParams<Record<'workspaceId' | 'channelId', string>>()
+  const queryClient = useQueryClient()
+
   if (reactions.length === 0 || !currentUserId) {
     return null
   }
@@ -41,6 +47,10 @@ export const Reactions = ({
         toast.error('Failed to toggle reaction')
         return
       }
+
+      queryClient.invalidateQueries({
+        queryKey: [getChannelMessagesCacheKey, params.channelId],
+      })
     })
   }
 

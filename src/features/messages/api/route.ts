@@ -1,3 +1,4 @@
+import { MESSAGE_LIMIT } from '@/constants'
 import { db } from '@/db/db'
 import { type SelectReaction, messages } from '@/db/schema'
 import { sessionMiddleware } from '@/lib/auth/session-middleware'
@@ -12,7 +13,7 @@ const app = new Hono().get('/:channelId', sessionMiddleware, async (c) => {
   const messageList = await db.query.messages.findMany({
     where: eq(messages.channelId, channelId),
     orderBy: (messages, { desc }) => [desc(messages.createdAt)],
-    limit: 20,
+    limit: MESSAGE_LIMIT,
     offset: Number(offset),
     with: {
       threads: {

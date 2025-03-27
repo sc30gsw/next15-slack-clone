@@ -28,28 +28,7 @@ const ChannelIdPage = async ({
         </Suspense>
       </div>
       <div className="flex-1" />
-      <Suspense
-        fallback={
-          <div className="flex flex-col gap-y-4 p-1.5 px-5">
-            {Array.from({ length: 5 }).map(() => (
-              <div key={crypto.randomUUID()}>
-                <div className="flex items-start gap-2">
-                  <Skeleton className="size-6" />
-                  <Skeleton className="h-4 w-25" />
-                  <Skeleton className="h-4 w-14" />
-                </div>
-                <div className="flex flex-col gap-y-1.5 ml-8">
-                  <Skeleton className="h-3 w-2/5" />
-                  <Skeleton className="h-3 w-1/3" />
-                  <Skeleton className="h-3 w-1/4" />
-                </div>
-              </div>
-            ))}
-          </div>
-        }
-      >
-        <MessageList workspaceId={workspaceId} channelId={channelId} />
-      </Suspense>
+      <MessageList workspaceId={workspaceId} channelId={channelId} />
       <Suspense fallback={<Skeleton className="h-39 w-248 mx-5 mb-2" />}>
         {channelPromise.then((channel) => (
           <ChatInput placeholder={`Message # ${channel.name}`} />

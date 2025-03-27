@@ -8,6 +8,7 @@ import {} from '@conform-to/zod'
 import { IconLetterCase, IconMoodSmile, IconPhoto } from '@tabler/icons-react'
 import { IconSend2, IconX } from 'justd-icons'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import type { Delta, Op, QuillOptions } from 'quill'
 import Quill from 'quill'
 import {
@@ -53,6 +54,8 @@ export const Editor = ({
   const defaultValueRef = useRef(defaultValue)
   const disabledRef = useRef(disabled)
   const imageElementRef = useRef<HTMLInputElement>(null)
+
+  const router = useRouter()
 
   useLayoutEffect(() => {
     submitRef.current = onSubmit
@@ -195,7 +198,6 @@ export const Editor = ({
                 label="Remove image"
                 showArrow={false}
                 disabled={disabled}
-                // placement="top left"
                 onPress={() => {
                   setImage(null)
                   if (imageElementRef.current) {
