@@ -192,6 +192,7 @@ export const messages = sqliteTable(
       .$defaultFn(() => crypto.randomUUID()),
     body: text('body').notNull(),
     image: text('image'),
+    isUpdated: integer('isUpdated').default(0),
     channelId: text('channelId').references(() => channels.id, {
       onDelete: 'cascade',
     }),
