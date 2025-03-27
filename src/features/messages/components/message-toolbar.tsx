@@ -10,7 +10,7 @@ type MessageToolbarProps = {
   handleEdit: () => void
   handleDelete: () => void
   // handleThread: () => void
-  // handleReaction: (value: string) => void
+  handleReaction: (value: string) => void
   hideThreadButton?: boolean
 }
 
@@ -20,13 +20,9 @@ export const MessageToolbar = ({
   handleEdit,
   handleDelete,
   // handleThread,
-  // handleReaction,
+  handleReaction,
   hideThreadButton,
 }: MessageToolbarProps) => {
-  const handleReaction = (value: string) => {
-    console.log('🚀 ~ handleReaction ~ value:', value)
-  }
-
   return (
     <div className="absolute top-0 right-5">
       <div className="group-hover:opacity-100 opacity-0 transition-opacity border bg-white rounded-md shadow-sm">
