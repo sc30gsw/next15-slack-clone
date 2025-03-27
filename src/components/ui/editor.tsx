@@ -30,6 +30,7 @@ type EditorProps = {
   disabled?: boolean
   innerRef?: RefObject<Quill | null>
   variant?: 'create' | 'update'
+  onCancel?: () => void
 }
 
 export const Editor = ({
@@ -39,6 +40,7 @@ export const Editor = ({
   disabled = false,
   innerRef,
   variant = 'create',
+  onCancel,
 }: EditorProps) => {
   const [text, setText] = useState('')
   const [image, setImage] = useState<File | null>(null)
@@ -247,7 +249,12 @@ export const Editor = ({
 
           {variant === 'update' && (
             <div className="ml-auto flex items-center gap-x-2">
-              <Button intent="outline" size="small" isDisabled={disabled}>
+              <Button
+                intent="outline"
+                size="small"
+                isDisabled={disabled}
+                onPress={onCancel}
+              >
                 Cancel
               </Button>
               <Button
