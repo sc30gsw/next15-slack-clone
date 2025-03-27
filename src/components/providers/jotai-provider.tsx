@@ -1,10 +1,6 @@
 import { Provider } from 'jotai'
 import type { ReactNode } from 'react'
 
-type JotaiProviderProps = {
-  children: ReactNode
-}
-
-export const JotaiProvider = ({ children }: JotaiProviderProps) => {
+export const JotaiProvider = ({ children }: Record<'children', ReactNode>) => {
   return <Provider>{children}</Provider>
 }
