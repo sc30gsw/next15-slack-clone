@@ -35,16 +35,18 @@ export const updateMessageAction = async (data: UpdateMessageInput) => {
     }
   }
 
-  const message = await db.query.messages.findFirst({
+  const messagePromise = db.query.messages.findFirst({
     where: eq(messages.id, result.data.id),
   })
 
-  const member = await db.query.members.findFirst({
+  const memberPromise = db.query.members.findFirst({
     where: and(
       eq(members.workspaceId, result.data.workspaceId),
       eq(members.userId, session.user.id),
     ),
   })
+
+  const [member, message] = await Promise.all([memberPromise, messagePromise])
 
   if (!member || message?.userId !== member.userId) {
     return {
