@@ -5,6 +5,7 @@ import { Toast } from '@/components/justd/ui'
 import { Providers } from '@/components/providers/providers'
 import { Modals } from '@/components/ui/modals'
 import { Root } from '@/hooks/use-confirm'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import type { ReactNode } from 'react'
 
 const geistSans = Geist({
@@ -37,12 +38,14 @@ const RootLayout = ({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <Toast />
-          <Root />
-          <Modals />
-          {children}
-        </Providers>
+        <NuqsAdapter>
+          <Providers>
+            <Toast />
+            <Root />
+            <Modals />
+            {children}
+          </Providers>
+        </NuqsAdapter>
       </body>
     </html>
   )

@@ -1,7 +1,9 @@
 'use client'
 
 import { Editor } from '@/components/ui/editor'
+import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { createMessageAction } from '@/features/messages/actions/create-message-action'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { useParams } from 'next/navigation'
 import type Quill from 'quill'
@@ -12,6 +14,8 @@ type ChatInputProps = { placeholder: string }
 
 export const ChatInput = ({ placeholder }: ChatInputProps) => {
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
+  const queryClient = useQueryClient()
+
   const editorRef = useRef<Quill | null>(null)
 
   const [editorKey, setEditorKey] = useState(0)
@@ -38,6 +42,10 @@ export const ChatInput = ({ placeholder }: ChatInputProps) => {
 
       setEditorKey((prev) => prev + 1)
       editorRef?.current?.enable(true)
+
+      queryClient.invalidateQueries({
+        queryKey: [getChannelMessagesCacheKey, params.channelId],
+      })
     })
   }
 

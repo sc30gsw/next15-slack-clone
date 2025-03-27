@@ -1,6 +1,5 @@
-'use client'
-
 import { Editor } from '@/components/ui/editor'
+import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { deleteMessageAction } from '@/features/messages/actions/delete-message-action'
 import { updateMessageAction } from '@/features/messages/actions/update-message-action'
 import { MessageToolbar } from '@/features/messages/components/message-toolbar'
@@ -8,6 +7,7 @@ import { toggleReactionAction } from '@/features/reactions/action/toggle-reactio
 import { Confirm } from '@/hooks/use-confirm'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
+import { useQueryClient } from '@tanstack/react-query'
 import type { InferResponseType } from 'hono'
 import { useParams } from 'next/navigation'
 import { type JSX, type ReactNode, useState, useTransition } from 'react'
@@ -53,6 +53,8 @@ export const Message = ({
 }: MessageProps) => {
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
 
+  const queryClient = useQueryClient()
+
   const [editMessageId, setEditMessageId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [isDeletionPending, startDeletionTransition] = useTransition()
@@ -74,6 +76,10 @@ export const Message = ({
       }
 
       toast.success('Message updated')
+
+      queryClient.invalidateQueries({
+        queryKey: [getChannelMessagesCacheKey, params.channelId],
+      })
 
       setEditMessageId(null)
     })
@@ -98,6 +104,10 @@ export const Message = ({
         return
       }
 
+      queryClient.invalidateQueries({
+        queryKey: [getChannelMessagesCacheKey, params.channelId],
+      })
+
       toast.success('Message deleted')
     })
   }
@@ -113,6 +123,10 @@ export const Message = ({
         toast.error('Failed to toggle reaction')
         return
       }
+
+      queryClient.invalidateQueries({
+        queryKey: [getChannelMessagesCacheKey, params.channelId],
+      })
 
       toast.success('Reaction added')
     })
