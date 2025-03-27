@@ -12,7 +12,7 @@ const app = new Hono().get('/:channelId', sessionMiddleware, async (c) => {
 
   const messageList = await db.query.messages.findMany({
     where: eq(messages.channelId, channelId),
-    orderBy: (messages, { desc }) => [desc(messages.createdAt)],
+    orderBy: (messages, { asc }) => [asc(messages.createdAt)],
     limit: MESSAGE_LIMIT,
     offset: Number(offset),
     with: {
