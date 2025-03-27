@@ -8,7 +8,6 @@ import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { Message } from '@/features/messages/components/message'
 import { Thumbnail } from '@/features/messages/components/thumbnail'
 import { getChannelMessages } from '@/features/messages/server/fetcher'
-import { getGroupedMessage } from '@/features/messages/utils/get-grouped-messages'
 import { Reactions } from '@/features/reactions/components/reactions'
 import { formatDateLabel, formatFullTime } from '@/lib/date'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -16,6 +15,7 @@ import { compareDesc, differenceInMinutes, format } from 'date-fns'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { Virtuoso } from 'react-virtuoso'
+import { groupBy, map, mapValues, pipe, reverse } from 'remeda'
 
 const TIME_THRESHOLD = 5
 
@@ -43,7 +43,6 @@ export const VirtuosoMessageList = ({
         )
       },
       getNextPageParam: (lastPage, allPages) => {
-        // ✅ オフセットベースで計算
         return lastPage.length === MESSAGE_LIMIT
           ? allPages.length * MESSAGE_LIMIT
           : undefined
@@ -78,8 +77,14 @@ export const VirtuosoMessageList = ({
     }
   }
 
-  const allMessages = data?.pages.flat() || []
-  const groupedMessages = getGroupedMessage(allMessages)
+  const groupedMessages = pipe(
+    data?.pages.flat() ?? [],
+    map((message) => message),
+    reverse(),
+    groupBy((message) => format(new Date(message.createdAt), 'yyyy-MM-dd')),
+    mapValues((messages) => reverse(messages)),
+  )
+
   const messagesObject = Object.entries(groupedMessages)
 
   return (
