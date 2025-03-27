@@ -48,7 +48,7 @@ const ChannelIdPage = async ({
           </div>
         }
       >
-        <MessageList channelId={channelId} />
+        <MessageList workspaceId={workspaceId} channelId={channelId} />
       </Suspense>
       <Suspense fallback={<Skeleton className="h-39 w-248 mx-5 mb-2" />}>
         {channelPromise.then((channel) => (
