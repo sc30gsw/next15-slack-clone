@@ -1,5 +1,4 @@
 import { format, isToday, isYesterday } from 'date-fns'
-import 'server-only'
 
 export const formatDateLabel = (dateStr: string) => {
   const date = new Date(dateStr)
