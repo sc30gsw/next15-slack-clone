@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Toast } from '@/components/justd/ui'
+import { NuqsProvider } from '@/components/providers/nuqs-provider'
 import { Providers } from '@/components/providers/providers'
 import { Modals } from '@/components/ui/modals'
 import { Root } from '@/hooks/use-confirm'
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import type { ReactNode } from 'react'
 
 const geistSans = Geist({
@@ -38,14 +38,14 @@ const RootLayout = ({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NuqsAdapter>
-          <Providers>
+        <Providers>
+          <NuqsProvider>
             <Toast />
             <Root />
             <Modals />
             {children}
-          </Providers>
-        </NuqsAdapter>
+          </NuqsProvider>
+        </Providers>
       </body>
     </html>
   )
