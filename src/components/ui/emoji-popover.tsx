@@ -2,10 +2,12 @@ import { Popover, Tooltip } from '@/components/justd/ui'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { useTheme } from 'next-themes'
-import { type ReactNode, useRef, useState } from 'react'
+import { type ComponentProps, type ReactNode, useRef, useState } from 'react'
 
 type EmojiPopoverProps = {
   children: ReactNode
+  disabled?: boolean
+  placement?: ComponentProps<typeof Popover.Content>['placement']
   hint?: string
   onEmojiSelect: (
     emoji: Record<'id' | 'name' | 'native' | 'shortcodes' | 'unified', string> &
@@ -15,6 +17,8 @@ type EmojiPopoverProps = {
 
 export const EmojiPopover = ({
   children,
+  disabled,
+  placement,
   hint = 'Emoji',
   onEmojiSelect,
 }: EmojiPopoverProps) => {
@@ -39,7 +43,11 @@ export const EmojiPopover = ({
   return (
     <>
       <Tooltip isOpen={tooltipOpen} onOpenChange={setTooltipOpen} delay={50}>
-        <Tooltip.Trigger ref={triggerRef} onPress={() => setPopoverOpen(true)}>
+        <Tooltip.Trigger
+          ref={triggerRef}
+          isDisabled={disabled}
+          onPress={() => setPopoverOpen(true)}
+        >
           {children}
         </Tooltip.Trigger>
 
@@ -51,7 +59,8 @@ export const EmojiPopover = ({
         triggerRef={triggerRef}
         isOpen={popoverOpen}
         onOpenChange={setPopoverOpen}
-        className="p-0 w-full border-none shadow-none"
+        placement={placement}
+        className="p-0 border-none shadow-none"
       >
         <Picker
           data={data}
