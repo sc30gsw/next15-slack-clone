@@ -28,7 +28,7 @@ const app = new Hono().get('/:channelId', sessionMiddleware, async (c) => {
 
   const messagesWithReaction = messageList.map((message) => {
     const reactions = message.reactions
-    const reactionsWithoutMemberIdProperty = pipe(
+    const reactionsWithMemberIds = pipe(
       reactions,
       map((reaction) => {
         return {
@@ -55,12 +55,11 @@ const app = new Hono().get('/:channelId', sessionMiddleware, async (c) => {
         },
         [] as Array<SelectReaction & { count: number; memberIds: string[] }>,
       ),
-      map(({ memberIds, ...rest }) => rest),
     )
 
     return {
       ...message,
-      reactions: reactionsWithoutMemberIdProperty,
+      reactions: reactionsWithMemberIds,
     }
   })
 
