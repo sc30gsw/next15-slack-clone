@@ -1,26 +1,19 @@
 'use client'
 
 import { Modal } from '@/components/justd/ui'
-import Image from 'next/image'
+import type { JSX, ReactNode } from 'react'
 
-export const Thumbnail = ({
-  url,
-}: Record<'url', string | null | undefined>) => {
-  if (!url) {
-    return null
-  }
+type ThumbnailProps = {
+  children: ReactNode
+  modalContentImage: JSX.Element
+}
 
+export const Thumbnail = ({ children, modalContentImage }: ThumbnailProps) => {
   return (
     <Modal>
       <Modal.Trigger>
         <div className="relative overflow-hidden max-w-90 border rounded-lg my-2 cursor-zoom-in">
-          <Image
-            src={url}
-            alt="Message image"
-            height={100}
-            width={100}
-            className="rounded-md object-cover size-full"
-          />
+          {children}
         </div>
       </Modal.Trigger>
       <Modal.Content
@@ -28,13 +21,7 @@ export const Thumbnail = ({
           content: 'max-w-100 border-none bg-transparent p-0 shadow-none',
         }}
       >
-        <Image
-          src={url}
-          alt="Message image"
-          height={100}
-          width={100}
-          className="rounded-md object-cover size-full"
-        />
+        {modalContentImage}
       </Modal.Content>
     </Modal>
   )

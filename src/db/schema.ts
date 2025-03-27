@@ -340,11 +340,6 @@ export const reactions = sqliteTable(
     index('reaction_workspaceId').on(reaction.workspaceId),
     index('reaction_messageId').on(reaction.messageId),
     index('reaction_userId').on(reaction.userId),
-    uniqueIndex('workspaceId_messageId_userId').on(
-      reaction.workspaceId,
-      reaction.messageId,
-      reaction.userId,
-    ),
   ],
 )
 

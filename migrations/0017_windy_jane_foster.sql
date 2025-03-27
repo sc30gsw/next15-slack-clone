@@ -1,0 +1,1 @@
+DROP INDEX `workspaceId_messageId_userId`;
