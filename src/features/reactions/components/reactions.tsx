@@ -88,12 +88,9 @@ export const Reactions = ({
         onEmojiSelect={(emoji) => toggleReaction(emoji.native)}
         disabled={isPending}
       >
-        <button
-          type="button"
-          className="h-7 px-3 rounded-full bg-slate-200/70 border border-transparent hover:border-slate-500 text-slate-800 flex items-center gap-x-1 cursor-pointer"
-        >
+        <div className="h-7 px-3 rounded-full bg-slate-200/70 border border-transparent hover:border-slate-500 text-slate-800 flex items-center gap-x-1 cursor-pointer">
           <IconMoodPlus stroke={2} className="size-4" />
-        </button>
+        </div>
       </EmojiPopover>
     </div>
   )
