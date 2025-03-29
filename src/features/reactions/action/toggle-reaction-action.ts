@@ -81,27 +81,24 @@ export const toggleReactionAction = async (data: ToggleReactionInput) => {
     return {
       status: 'success',
       initialValue: {
-        reactionId: existingMessageReactionFromUser.id,
+        messageId: message.id,
       },
     }
   }
 
-  const [newReactionId] = await db
-    .insert(reactions)
-    .values({
-      workspaceId: message.workspaceId,
-      messageId: message.id,
-      userId: session.user.id,
-      value: result.data.value,
-    })
-    .returning({ id: reactions.id })
+  await db.insert(reactions).values({
+    workspaceId: message.workspaceId,
+    messageId: message.id,
+    userId: session.user.id,
+    value: result.data.value,
+  })
 
   revalidateTag(`${getChannelMessagesCacheKey}/${message.channelId}`)
 
   return {
     status: 'success',
     initialValue: {
-      reactionId: newReactionId.id,
+      messageId: message.id,
     },
   }
 }
