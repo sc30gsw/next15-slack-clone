@@ -1,38 +1,56 @@
+import { Avatar } from '@/components/justd/ui'
 import { Editor } from '@/components/ui/editor'
-import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
+import { Hint } from '@/components/ui/hint'
+import { Renderer } from '@/components/ui/renderer'
+import {
+  getChannelMessagesCacheKey,
+  getMessageCacheKey,
+} from '@/constants/cache-keys'
 import { deleteMessageAction } from '@/features/messages/actions/delete-message-action'
 import { updateMessageAction } from '@/features/messages/actions/update-message-action'
 import { MessageToolbar } from '@/features/messages/components/message-toolbar'
+import { Thumbnail } from '@/features/messages/components/thumbnail'
+import { usePanel } from '@/features/messages/hooks/use-panel'
+import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
+import { Reactions } from '@/features/reactions/components/reactions'
 import { Confirm } from '@/hooks/use-confirm'
+import { formatFullTime } from '@/lib/date'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
 import { useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import type { InferResponseType } from 'hono'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import { type JSX, type ReactNode, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
 type MessageMember = InferResponseType<
-  (typeof client.api.messages)[':channelId']['$get'],
+  (typeof client.api.messages.channel)[':channelId']['$get'],
   200
 >['messages'][number]['member']
 
+type MessageUser = InferResponseType<
+  (typeof client.api.messages.channel)[':channelId']['$get'],
+  200
+>['messages'][number]['user']
+
 type MessageProps = Pick<
   InferResponseType<
-    (typeof client.api.messages)[':channelId']['$get'],
+    (typeof client.api.messages.channel)[':channelId']['$get'],
     200
   >['messages'][number],
-  'id' | 'body' | 'image' | 'isUpdated' | 'createdAt' | 'threads'
+  'id' | 'body' | 'image' | 'isUpdated' | 'createdAt' | 'threads' | 'reactions'
 > & {
   memberId: MessageMember['userId']
   isAuthor: boolean
   threadCount: number
   isCompact?: boolean
   hideThreadButton?: boolean
-  authorAvatar: JSX.Element
-  children: ReactNode
-  createdAtHint: JSX.Element
+  authorImage: MessageUser['image']
+  authorName: MessageUser['name']
+  userId?: string
 }
 
 export const Message = ({
@@ -43,17 +61,22 @@ export const Message = ({
   createdAt,
   threads,
   threadCount,
+  reactions,
   memberId,
   isAuthor,
   isCompact,
   hideThreadButton,
-  authorAvatar,
-  children,
-  createdAtHint,
+  authorImage,
+  authorName,
+  userId,
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Since this is a common component, having many props is unavoidable.
 }: MessageProps) => {
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
 
   const queryClient = useQueryClient()
+
+  const { parentMessageId, onOpenMessage, onClose } = usePanel()
+  const { refetch } = useThreadMessage(parentMessageId, userId ?? undefined)
 
   const [editMessageId, setEditMessageId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -81,9 +104,16 @@ export const Message = ({
         queryKey: [getChannelMessagesCacheKey, params.channelId],
       })
 
+      queryClient.invalidateQueries({
+        queryKey: [getMessageCacheKey, result.initialValue?.id],
+      })
+
       setEditMessageId(null)
+
+      await refetch()
     })
   }
+
   const handleDelete = async () => {
     const ok = await Confirm.call({
       title: 'Delete message?',
@@ -109,6 +139,15 @@ export const Message = ({
       })
 
       toast.success('Message deleted')
+
+      if (parentMessageId === result.initialValue.id) {
+        queryClient.invalidateQueries({
+          queryKey: [getMessageCacheKey, result.initialValue.id],
+        })
+
+        onClose()
+        await refetch()
+      }
     })
   }
 
@@ -123,12 +162,19 @@ export const Message = ({
         toast.error('Failed to toggle reaction')
         return
       }
+      toast.success('Reaction added')
 
       queryClient.invalidateQueries({
         queryKey: [getChannelMessagesCacheKey, params.channelId],
       })
 
-      toast.success('Reaction added')
+      if (parentMessageId && parentMessageId === id) {
+        queryClient.invalidateQueries({
+          queryKey: [getMessageCacheKey, result.initialValue?.messageId],
+        })
+
+        await refetch()
+      }
     })
   }
 
@@ -143,7 +189,11 @@ export const Message = ({
         )}
       >
         <div className="flex items-start gap-2">
-          {createdAtHint}
+          <Hint label={formatFullTime(new Date(createdAt))} showArrow={false}>
+            <div className="text-xs text-muted-fg opacity-0 group-hover:opacity-100 w-10 leading-5.5 text-center hover:underline">
+              {format(new Date(createdAt), 'hh:mm')}
+            </div>
+          </Hint>
           {isEditing ? (
             <div className="w-full h-full">
               <Editor
@@ -155,7 +205,55 @@ export const Message = ({
               />
             </div>
           ) : (
-            children
+            <div className="flex flex-col w-full overflow-hidden">
+              <div className="text-sm">
+                <button
+                  type="button"
+                  className="font-bold text-black hover:underline cursor-pointer"
+                >
+                  {authorName}
+                </button>
+                <span>&nbsp;&nbsp;</span>
+                <Hint
+                  label={formatFullTime(new Date(createdAt))}
+                  showArrow={false}
+                >
+                  <p className="text-sm text-muted-fg hover:underline cursor-pointer">
+                    {format(new Date(createdAt), 'h:mm a')}
+                  </p>
+                </Hint>
+              </div>
+              <Renderer value={body} />
+              {image && (
+                <Thumbnail
+                  modalContentImage={
+                    <Image
+                      src={image}
+                      alt="Message image"
+                      height={100}
+                      width={100}
+                      className="rounded-md object-cover size-full"
+                    />
+                  }
+                >
+                  <Image
+                    src={image}
+                    alt="Message image"
+                    height={100}
+                    width={100}
+                    className="rounded-md object-cover size-full"
+                  />
+                </Thumbnail>
+              )}
+              {isUpdated === 1 && (
+                <span className="text-xs text-muted-fg">(edited)</span>
+              )}
+              <Reactions
+                reactions={reactions}
+                messageId={id}
+                currentUserId={userId}
+              />
+            </div>
           )}
         </div>
         {!isEditing && (
@@ -164,6 +262,7 @@ export const Message = ({
             isPending={isPending || isDeletionPending}
             handleEdit={() => setEditMessageId(id)}
             handleDelete={handleDelete}
+            handleThread={() => onOpenMessage(id)}
             handleReaction={toggleReaction}
             hideThreadButton={hideThreadButton}
           />
@@ -183,7 +282,14 @@ export const Message = ({
     >
       <div className="flex items-start gap-2">
         <button type="button" className="cursor-pointer">
-          {authorAvatar}
+          <Avatar
+            alt={authorName ?? 'Member'}
+            size="small"
+            shape="square"
+            src={authorImage}
+            initials={authorName?.charAt(0).toUpperCase()}
+            className="bg-sky-500 text-white"
+          />
         </button>
         {isEditing ? (
           <div className="w-full h-full">
@@ -196,7 +302,55 @@ export const Message = ({
             />
           </div>
         ) : (
-          children
+          <div className="flex flex-col w-full">
+            <div className="text-sm">
+              <button
+                type="button"
+                className="font-bold text-black hover:underline cursor-pointer"
+              >
+                {authorName}
+              </button>
+              <span>&nbsp;&nbsp;</span>
+              <Hint
+                label={formatFullTime(new Date(createdAt))}
+                showArrow={false}
+              >
+                <p className="text-sm text-muted-fg hover:underline cursor-pointer">
+                  {format(new Date(createdAt), 'h:mm a')}
+                </p>
+              </Hint>
+            </div>
+            <Renderer value={body} />
+            {image && (
+              <Thumbnail
+                modalContentImage={
+                  <Image
+                    src={image}
+                    alt="Message image"
+                    height={100}
+                    width={100}
+                    className="rounded-md object-cover size-full"
+                  />
+                }
+              >
+                <Image
+                  src={image}
+                  alt="Message image"
+                  height={100}
+                  width={100}
+                  className="rounded-md object-cover size-full"
+                />
+              </Thumbnail>
+            )}
+            {isUpdated === 1 && (
+              <span className="text-xs text-muted-fg">(edited)</span>
+            )}
+            <Reactions
+              reactions={reactions}
+              messageId={id}
+              currentUserId={userId}
+            />
+          </div>
         )}
       </div>
       {!isEditing && (
@@ -205,6 +359,7 @@ export const Message = ({
           isPending={isPending || isDeletionPending}
           handleEdit={() => setEditMessageId(id)}
           handleDelete={handleDelete}
+          handleThread={() => onOpenMessage(id)}
           handleReaction={toggleReaction}
           hideThreadButton={hideThreadButton}
         />

@@ -9,7 +9,7 @@ type MessageToolbarProps = {
   isPending: boolean
   handleEdit: () => void
   handleDelete: () => void
-  // handleThread: () => void
+  handleThread: () => void
   handleReaction: (value: string) => void
   hideThreadButton?: boolean
 }
@@ -19,7 +19,7 @@ export const MessageToolbar = ({
   isPending,
   handleEdit,
   handleDelete,
-  // handleThread,
+  handleThread,
   handleReaction,
   hideThreadButton,
 }: MessageToolbarProps) => {
@@ -36,7 +36,12 @@ export const MessageToolbar = ({
           </div>
         </EmojiPopover>
         {!hideThreadButton && (
-          <Hint label="Reply in thread" showArrow={false} disabled={isPending}>
+          <Hint
+            label="Reply in thread"
+            showArrow={false}
+            disabled={isPending}
+            onPress={handleThread}
+          >
             <div className="bg-transparent hover:bg-neutral-300/60 outline-none border-none font-semibold text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-300/60 data-pressed:bg-neutral-300/60shrink-0 rounded-md cursor-pointer">
               <IconMessageDots className="size-4" />
             </div>
