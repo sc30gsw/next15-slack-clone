@@ -2,7 +2,12 @@
 
 import { EmojiPopover } from '@/components/ui/emoji-popover'
 import { Hint } from '@/components/ui/hint'
-import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
+import {
+  getChannelMessagesCacheKey,
+  getMessageCacheKey,
+} from '@/constants/cache-keys'
+import { usePanel } from '@/features/messages/hooks/use-panel'
+import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
@@ -15,7 +20,7 @@ import { toast } from 'sonner'
 
 type ReactionsProps = {
   reactions: InferResponseType<
-    (typeof client.api.messages)[':channelId']['$get'],
+    (typeof client.api.messages.channel)[':channelId']['$get'],
     200
   >['messages'][number]['reactions']
   messageId: string
@@ -31,6 +36,12 @@ export const Reactions = ({
 
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
   const queryClient = useQueryClient()
+
+  const { parentMessageId } = usePanel()
+  const { refetch } = useThreadMessage(
+    parentMessageId,
+    currentUserId ?? undefined,
+  )
 
   if (reactions.length === 0 || !currentUserId) {
     return null
@@ -51,6 +62,14 @@ export const Reactions = ({
       queryClient.invalidateQueries({
         queryKey: [getChannelMessagesCacheKey, params.channelId],
       })
+
+      if (parentMessageId && parentMessageId === messageId) {
+        queryClient.invalidateQueries({
+          queryKey: [getMessageCacheKey, result.initialValue?.messageId],
+        })
+
+        await refetch()
+      }
     })
   }
 
