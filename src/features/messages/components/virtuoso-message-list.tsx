@@ -1,18 +1,14 @@
 'use client'
 
-import { Avatar, Loader, Skeleton } from '@/components/justd/ui'
-import { Hint } from '@/components/ui/hint'
-import { Renderer } from '@/components/ui/renderer'
+import { Skeleton } from '@/components/justd/ui'
 import { MESSAGE_LIMIT } from '@/constants'
 import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
+import { LoadMoreButton } from '@/features/messages/components/load-more-button'
 import { Message } from '@/features/messages/components/message'
-import { Thumbnail } from '@/features/messages/components/thumbnail'
 import { getChannelMessages } from '@/features/messages/server/fetcher'
-import { Reactions } from '@/features/reactions/components/reactions'
-import { formatDateLabel, formatFullTime } from '@/lib/date'
+import { formatDateLabel } from '@/lib/date'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { compareDesc, differenceInMinutes, format } from 'date-fns'
-import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { Virtuoso } from 'react-virtuoso'
 import { groupBy, map, mapValues, pipe, reverse } from 'remeda'
@@ -126,136 +122,27 @@ export const VirtuosoMessageList = ({
                   threads={message.threads}
                   memberId={message.member.userId}
                   isAuthor={message.userId === userId}
+                  authorName={message.user.name}
+                  authorImage={message.user.image}
                   isCompact={isCompact}
                   threadCount={message.threads.length}
+                  reactions={message.reactions}
                   hideThreadButton={variant === 'thread'}
-                  authorAvatar={
-                    <Avatar
-                      alt={message.user.name ?? 'Member'}
-                      size="small"
-                      shape="square"
-                      src={message.user.image}
-                      initials={message.user.name?.charAt(0).toUpperCase()}
-                      className="bg-sky-500 text-white"
-                    />
-                  }
-                  createdAtHint={
-                    <Hint
-                      label={formatFullTime(new Date(message.createdAt))}
-                      showArrow={false}
-                    >
-                      <div className="text-xs text-muted-fg opacity-0 group-hover:opacity-100 w-10 leading-5.5 text-center hover:underline">
-                        {format(new Date(message.createdAt), 'hh:mm')}
-                      </div>
-                    </Hint>
-                  }
-                >
-                  <div className="flex flex-col w-full">
-                    <Renderer value={message.body} />
-                    {message.image && (
-                      <Thumbnail
-                        modalContentImage={
-                          <Image
-                            src={message.image}
-                            alt="Message image"
-                            height={100}
-                            width={100}
-                            className="rounded-md object-cover size-full"
-                          />
-                        }
-                      >
-                        <Image
-                          src={message.image}
-                          alt="Message image"
-                          height={100}
-                          width={100}
-                          className="rounded-md object-cover size-full"
-                        />
-                      </Thumbnail>
-                    )}
-                    {message.isUpdated === 1 && (
-                      <span className="text-xs text-muted-fg">(edited)</span>
-                    )}
-                    <Reactions
-                      reactions={message.reactions}
-                      messageId={message.id}
-                      currentUserId={userId}
-                    />
-                  </div>
-                </Message>
+                  userId={userId}
+                />
               )
             })}
           </div>
         )
       }}
       increaseViewportBy={200}
-      // biome-ignore lint/style/useNamingConvention: <explanation>
-      components={{ Header: hasNextPage ? MoreButton : undefined }}
+      // biome-ignore lint/style/useNamingConvention: This is a prop from the library
+      components={{ Header: hasNextPage ? LoadMoreButton : undefined }}
       context={{
         loadMore,
         loading: isFetchingNextPage,
         canLoadMore: hasNextPage,
       }}
     />
-  )
-}
-
-const MoreButton = ({
-  context: { loadMore, loading, canLoadMore },
-}: {
-  context: { loadMore: () => void; loading: boolean; canLoadMore: boolean }
-}) => {
-  return (
-    <>
-      <div
-        className="h-1"
-        ref={(el) => {
-          if (el) {
-            const observer = new IntersectionObserver(
-              ([entry]) => {
-                if (entry.isIntersecting && canLoadMore) {
-                  loadMore()
-                }
-              },
-              { threshold: 1.0 },
-            )
-
-            observer.observe(el)
-
-            return () => observer.disconnect()
-          }
-        }}
-      />
-      {loading && (
-        <>
-          <div className="text-center my-2 relative">
-            <hr className="absolute top-1/2 left-0 right-0 border-t border-gray-300" />
-            <span className="relative inline-block bg-white px-4 py-1 rounded-full text-xs border border-gray-300 shadow-sm">
-              <Loader
-                size="medium"
-                intent="secondary"
-                className="animate-spin"
-              />
-            </span>
-          </div>
-          <div className="flex flex-col gap-y-4 p-1.5 px-5">
-            {Array.from({ length: 2 }).map(() => (
-              <div key={crypto.randomUUID()}>
-                <div className="flex items-start gap-2">
-                  <Skeleton className="size-6" />
-                  <Skeleton className="h-4 w-25" />
-                  <Skeleton className="h-4 w-14" />
-                </div>
-                <div className="flex flex-col gap-y-1.5 ml-8">
-                  <Skeleton className="h-3 w-2/5" />
-                  <Skeleton className="h-3 w-1/3" />
-                  <Skeleton className="h-3 w-1/4" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </>
   )
 }
