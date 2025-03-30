@@ -1,10 +1,9 @@
 'use client'
-
-import { Skeleton } from '@/components/justd/ui'
 import { MESSAGE_LIMIT } from '@/constants'
 import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { LoadMoreButton } from '@/features/messages/components/load-more-button'
 import { Message } from '@/features/messages/components/message'
+import { MessageListLoader } from '@/features/messages/components/message-list-loader'
 import { getChannelMessages } from '@/features/messages/server/fetcher'
 import { formatDateLabel } from '@/lib/date'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -47,24 +46,7 @@ export const VirtuosoMessageList = ({
     })
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col gap-y-4 p-1.5 px-5">
-        {Array.from({ length: 5 }).map(() => (
-          <div key={crypto.randomUUID()}>
-            <div className="flex items-start gap-2">
-              <Skeleton className="size-6" />
-              <Skeleton className="h-4 w-25" />
-              <Skeleton className="h-4 w-14" />
-            </div>
-            <div className="flex flex-col gap-y-1.5 ml-8">
-              <Skeleton className="h-3 w-2/5" />
-              <Skeleton className="h-3 w-1/3" />
-              <Skeleton className="h-3 w-1/4" />
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+    return <MessageListLoader />
   }
 
   const loadMore = () => {
@@ -119,13 +101,12 @@ export const VirtuosoMessageList = ({
                   image={message.image}
                   createdAt={message.createdAt}
                   isUpdated={message.isUpdated}
-                  threads={message.threads}
                   memberId={message.member.userId}
                   isAuthor={message.userId === userId}
                   authorName={message.user.name}
                   authorImage={message.user.image}
                   isCompact={isCompact}
-                  threadCount={message.threads.length}
+                  threadCount={message.threadCount.length}
                   reactions={message.reactions}
                   hideThreadButton={variant === 'thread'}
                   userId={userId}
