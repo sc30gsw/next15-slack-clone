@@ -181,9 +181,17 @@ const app = new Hono()
           .from(messages)
           .where(eq(messages.parentMessageId, thread.id))
 
+        const firstThread = await db.query.messages.findFirst({
+          where: eq(messages.parentMessageId, message.id),
+          with: {
+            user: true,
+          },
+        })
+
         return {
           ...thread,
           threadCount,
+          firstThread,
         }
       }),
     )

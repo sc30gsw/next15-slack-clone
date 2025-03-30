@@ -95,12 +95,16 @@ export const VirtuosoThreads = ({ userId, variant }: VirtuosoThreadsProps) => {
                   authorName={thread.user.name}
                   authorImage={thread.user.image}
                   isCompact={isCompact}
-                  threadCount={thread.threadCount.length}
+                  threadCount={thread.threadCount[0].count}
+                  firstThread={
+                    thread.threadCount[0].count > 0
+                      ? thread.firstThread
+                      : undefined
+                  }
                   reactions={thread.reactions}
                   hideThreadButton={variant === 'thread'}
                   userId={userId}
                   threadsRefetch={refetch}
-                  firstThread={undefined}
                 />
               )
             })}
