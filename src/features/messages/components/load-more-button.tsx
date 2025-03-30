@@ -23,7 +23,7 @@ export const LoadMoreButton = ({
                   loadMore()
                 }
               },
-              { threshold: 1.0 },
+              { threshold: 0.5 },
             )
 
             observer.observe(el)

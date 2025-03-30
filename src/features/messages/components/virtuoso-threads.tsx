@@ -100,6 +100,7 @@ export const VirtuosoThreads = ({ userId, variant }: VirtuosoThreadsProps) => {
                   hideThreadButton={variant === 'thread'}
                   userId={userId}
                   threadsRefetch={refetch}
+                  firstThread={undefined}
                 />
               )
             })}

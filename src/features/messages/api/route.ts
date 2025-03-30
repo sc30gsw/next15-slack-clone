@@ -23,6 +23,10 @@ const app = new Hono()
       },
     })
 
+    if (messageList.length === 0) {
+      return c.json({ messages: [] }, 200)
+    }
+
     const messagesWithThreads = await Promise.all(
       messageList.map(async (message) => {
         const threadCount = await db
@@ -30,49 +34,65 @@ const app = new Hono()
           .from(messages)
           .where(eq(messages.parentMessageId, message.id))
 
+        const firstThread = await db.query.messages.findFirst({
+          where: eq(messages.parentMessageId, message.id),
+          with: {
+            user: true,
+          },
+        })
+
         return {
           ...message,
           threadCount,
+          firstThread,
         }
       }),
     )
 
-    const messagesWithReaction = messagesWithThreads.map((message) => {
-      const reactions = message.reactions
-      const reactionsWithMemberIds = pipe(
-        reactions,
-        map((reaction) => {
-          return {
-            ...reaction,
-            count: reactions.filter((r) => r.value === reaction.value).length,
-          }
-        }),
-        reduce(
-          (acc, reaction) => {
-            const existingReaction = acc.find((r) => r.value === reaction.value)
-
-            if (existingReaction) {
-              existingReaction.memberIds = Array.from(
-                new Set([...existingReaction.memberIds, reaction.userId]),
-              )
-            } else {
-              acc.push({
-                ...reaction,
-                memberIds: [reaction.userId],
-              })
+    const messagesWithReaction = pipe(
+      messagesWithThreads,
+      // filter((message) => message.parentMessageId !== null),
+      map((message) => {
+        const reactions = message.reactions
+        const reactionsWithMemberIds = pipe(
+          reactions,
+          map((reaction) => {
+            return {
+              ...reaction,
+              count: reactions.filter((r) => r.value === reaction.value).length,
             }
+          }),
+          reduce(
+            (acc, reaction) => {
+              const existingReaction = acc.find(
+                (r) => r.value === reaction.value,
+              )
 
-            return acc
-          },
-          [] as Array<SelectReaction & { count: number; memberIds: string[] }>,
-        ),
-      )
+              if (existingReaction) {
+                existingReaction.memberIds = Array.from(
+                  new Set([...existingReaction.memberIds, reaction.userId]),
+                )
+              } else {
+                acc.push({
+                  ...reaction,
+                  memberIds: [reaction.userId],
+                })
+              }
 
-      return {
-        ...message,
-        reactions: reactionsWithMemberIds,
-      }
-    })
+              return acc
+            },
+            [] as Array<
+              SelectReaction & { count: number; memberIds: string[] }
+            >,
+          ),
+        )
+
+        return {
+          ...message,
+          reactions: reactionsWithMemberIds,
+        }
+      }),
+    )
 
     return c.json({ messages: messagesWithReaction }, 200)
   })

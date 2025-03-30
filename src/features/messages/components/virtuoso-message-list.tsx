@@ -1,4 +1,5 @@
 'use client'
+
 import { MESSAGE_LIMIT } from '@/constants'
 import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { LoadMoreButton } from '@/features/messages/components/load-more-button'
@@ -10,7 +11,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { compareDesc, differenceInMinutes, format } from 'date-fns'
 import { useParams } from 'next/navigation'
 import { Virtuoso } from 'react-virtuoso'
-import { groupBy, map, mapValues, pipe, reverse } from 'remeda'
+import { filter, groupBy, map, mapValues, pipe, reverse, sort } from 'remeda'
 
 const TIME_THRESHOLD = 5
 
@@ -72,9 +73,14 @@ export const VirtuosoMessageList = ({
       itemContent={(_, obj) => {
         const [dateKey, messages] = obj
 
-        const sortedMessages = messages.sort((a, b) =>
-          compareDesc(new Date(a.createdAt), new Date(b.createdAt)),
+        const sortedMessages = pipe(
+          messages,
+          sort((a, b) =>
+            compareDesc(new Date(a.createdAt), new Date(b.createdAt)),
+          ),
+          filter((message) => message.parentMessageId === null),
         )
+
         return (
           <div key={dateKey}>
             <div className="text-center my-2 relative">
@@ -106,7 +112,8 @@ export const VirtuosoMessageList = ({
                   authorName={message.user.name}
                   authorImage={message.user.image}
                   isCompact={isCompact}
-                  threadCount={message.threadCount.length}
+                  threadCount={message.threadCount[0].count}
+                  firstThread={message.firstThread}
                   reactions={message.reactions}
                   hideThreadButton={variant === 'thread'}
                   userId={userId}

@@ -64,6 +64,7 @@ export const ThreadMessage = ({
           reactions={message.reactions}
           hideThreadButton={true}
           userId={userId}
+          firstThread={undefined}
         />
       </div>
 

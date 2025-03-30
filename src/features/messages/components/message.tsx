@@ -21,8 +21,9 @@ import { formatFullTime } from '@/lib/date'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
 import { useQueryClient } from '@tanstack/react-query'
-import { format } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import type { InferResponseType } from 'hono'
+import { IconChevronRight } from 'justd-icons'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useState, useTransition } from 'react'
@@ -43,7 +44,13 @@ type MessageProps = Pick<
     (typeof client.api.messages.channel)[':channelId']['$get'],
     200
   >['messages'][number],
-  'id' | 'body' | 'image' | 'isUpdated' | 'createdAt' | 'reactions'
+  | 'id'
+  | 'body'
+  | 'image'
+  | 'isUpdated'
+  | 'createdAt'
+  | 'reactions'
+  | 'firstThread'
 > & {
   memberId: MessageMember['userId']
   isAuthor: boolean
@@ -63,6 +70,7 @@ export const Message = ({
   isUpdated,
   createdAt,
   threadCount,
+  firstThread,
   reactions,
   memberId,
   isAuthor,
@@ -379,6 +387,40 @@ export const Message = ({
               currentUserId={userId}
               threadsRefetch={threadsRefetch}
             />
+
+            {firstThread && (
+              <button
+                type="button"
+                className="p-1 flex items-center justify-between text-sm group cursor-pointer hover:border rounded-md transition-colors duration-200"
+                onClick={() => onOpenMessage(id)}
+              >
+                <div className="flex items-center gap-x-2">
+                  <Avatar
+                    size="small"
+                    shape="square"
+                    src={firstThread.user.image}
+                    alt={firstThread.user.name ?? 'Member'}
+                    initials={authorName?.charAt(0).toUpperCase()}
+                    className="bg-sky-500 text-white"
+                  />
+                  <span className="font-bold text-primary group-hover:underline transition-colors duration-200">
+                    {threadCount} reply
+                  </span>
+
+                  <div className="text-gray-500">
+                    <span className="block group-hover:hidden">
+                      {formatDistanceToNow(new Date(firstThread.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </span>
+                    <span className="hidden group-hover:flex items-center">
+                      View threads
+                    </span>
+                  </div>
+                </div>
+                <IconChevronRight className="size-5 hidden group-hover:block" />
+              </button>
+            )}
           </div>
         )}
       </div>
