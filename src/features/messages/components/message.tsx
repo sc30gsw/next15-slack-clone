@@ -5,6 +5,7 @@ import { Renderer } from '@/components/ui/renderer'
 import {
   getChannelMessagesCacheKey,
   getMessageCacheKey,
+  getThreadsCacheKey,
 } from '@/constants/cache-keys'
 import { deleteMessageAction } from '@/features/messages/actions/delete-message-action'
 import { updateMessageAction } from '@/features/messages/actions/update-message-action'
@@ -12,6 +13,7 @@ import { MessageToolbar } from '@/features/messages/components/message-toolbar'
 import { Thumbnail } from '@/features/messages/components/thumbnail'
 import { usePanel } from '@/features/messages/hooks/use-panel'
 import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
+import { useThreads } from '@/features/messages/hooks/use-threads'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
 import { Reactions } from '@/features/reactions/components/reactions'
 import { Confirm } from '@/hooks/use-confirm'
@@ -41,11 +43,11 @@ type MessageProps = Pick<
     (typeof client.api.messages.channel)[':channelId']['$get'],
     200
   >['messages'][number],
-  'id' | 'body' | 'image' | 'isUpdated' | 'createdAt' | 'threads' | 'reactions'
+  'id' | 'body' | 'image' | 'isUpdated' | 'createdAt' | 'reactions'
 > & {
   memberId: MessageMember['userId']
   isAuthor: boolean
-  threadCount: number
+  threadCount?: number
   isCompact?: boolean
   hideThreadButton?: boolean
   authorImage: MessageUser['image']
@@ -59,7 +61,6 @@ export const Message = ({
   image,
   isUpdated,
   createdAt,
-  threads,
   threadCount,
   reactions,
   memberId,
@@ -77,6 +78,7 @@ export const Message = ({
 
   const { parentMessageId, onOpenMessage, onClose } = usePanel()
   const { refetch } = useThreadMessage(parentMessageId, userId ?? undefined)
+  const { refetch: threadsRefetch } = useThreads(parentMessageId, userId)
 
   const [editMessageId, setEditMessageId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -108,9 +110,14 @@ export const Message = ({
         queryKey: [getMessageCacheKey, result.initialValue?.id],
       })
 
+      queryClient.invalidateQueries({
+        queryKey: [getThreadsCacheKey, parentMessageId],
+      })
+
       setEditMessageId(null)
 
       await refetch()
+      await threadsRefetch()
     })
   }
 
@@ -140,6 +147,12 @@ export const Message = ({
 
       toast.success('Message deleted')
 
+      queryClient.invalidateQueries({
+        queryKey: [getThreadsCacheKey, parentMessageId],
+      })
+
+      await threadsRefetch()
+
       if (parentMessageId === result.initialValue.id) {
         queryClient.invalidateQueries({
           queryKey: [getMessageCacheKey, result.initialValue.id],
@@ -167,6 +180,12 @@ export const Message = ({
       queryClient.invalidateQueries({
         queryKey: [getChannelMessagesCacheKey, params.channelId],
       })
+
+      queryClient.invalidateQueries({
+        queryKey: [getThreadsCacheKey, parentMessageId],
+      })
+
+      await threadsRefetch()
 
       if (parentMessageId && parentMessageId === id) {
         queryClient.invalidateQueries({
@@ -284,8 +303,8 @@ export const Message = ({
         <button type="button" className="cursor-pointer">
           <Avatar
             alt={authorName ?? 'Member'}
-            size="small"
             shape="square"
+            size="large"
             src={authorImage}
             initials={authorName?.charAt(0).toUpperCase()}
             className="bg-sky-500 text-white"

@@ -45,3 +45,28 @@ export const getMessage = async (
 
   return res.message
 }
+
+export const getThreads = async (
+  req: InferRequestType<
+    (typeof client.api.messages.threads)[':messageId']['$get']
+  > &
+    Partial<Record<'userId', string>>,
+  offset: number,
+) => {
+  const url = client.api.messages.threads[':messageId'].$url({
+    param: req.param,
+  })
+  url.searchParams.set('offset', offset.toString())
+  type ResType = InferResponseType<
+    (typeof client.api.messages.threads)[':messageId']['$get'],
+    200
+  >
+
+  const res = await fetcher<ResType>(url, {
+    headers: {
+      Authorization: req.userId ?? '',
+    },
+  })
+
+  return res.threads
+}

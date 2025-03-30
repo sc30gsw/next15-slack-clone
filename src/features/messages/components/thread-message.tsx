@@ -1,7 +1,9 @@
 'use client'
-
-import { Loader } from '@/components/justd/ui'
+import { Skeleton } from '@/components/justd/ui'
 import { Message } from '@/features/messages/components/message'
+import { MessageListLoader } from '@/features/messages/components/message-list-loader'
+import { ThreadInput } from '@/features/messages/components/thread-input'
+import { VirtuosoThreads } from '@/features/messages/components/virtuoso-threads'
 import { usePanel } from '@/features/messages/hooks/use-panel'
 import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
 import { IconTriangleExclamation } from 'justd-icons'
@@ -11,16 +13,19 @@ export const ThreadMessage = ({
 }: Partial<Record<'userId', string>>) => {
   const { parentMessageId } = usePanel()
   const {
-    isFetching,
     isError,
     data: message,
+    isLoading,
   } = useThreadMessage(parentMessageId, userId)
 
-  if (isFetching || !parentMessageId) {
+  if (isLoading || !parentMessageId) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <Loader size="medium" className="animate-spin" />
-      </div>
+      <>
+        <MessageListLoader length={1} />
+        <div className="flex justify-center items-center">
+          <Skeleton className="h-39 w-[90%] mx-4 mb-2" />
+        </div>
+      </>
     )
   }
 
@@ -43,24 +48,30 @@ export const ThreadMessage = ({
   }
 
   return (
-    <div>
-      <Message
-        id={message.id}
-        body={message.body}
-        image={message.image}
-        createdAt={message.createdAt}
-        isUpdated={message.isUpdated}
-        memberId={message.member.userId}
-        isAuthor={message.userId === userId}
-        authorName={message.user.name}
-        authorImage={message.user.image}
-        isCompact={false}
-        threadCount={message.threads.length}
-        threads={message.threads}
-        reactions={message.reactions}
-        hideThreadButton={true}
-        userId={userId}
-      />
+    <div className="flex-1 flex flex-col justify-between">
+      <div>
+        <Message
+          id={message.id}
+          body={message.body}
+          image={message.image}
+          createdAt={message.createdAt}
+          isUpdated={message.isUpdated}
+          memberId={message.member.userId}
+          isAuthor={message.userId === userId}
+          authorName={message.user.name}
+          authorImage={message.user.image}
+          isCompact={false}
+          reactions={message.reactions}
+          hideThreadButton={true}
+          userId={userId}
+        />
+      </div>
+
+      <VirtuosoThreads userId={userId} />
+
+      <div className="px-4">
+        <ThreadInput userId={userId} />
+      </div>
     </div>
   )
 }
