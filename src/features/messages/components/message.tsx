@@ -13,7 +13,7 @@ import { MessageToolbar } from '@/features/messages/components/message-toolbar'
 import { Thumbnail } from '@/features/messages/components/thumbnail'
 import { usePanel } from '@/features/messages/hooks/use-panel'
 import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
-import { useThreads } from '@/features/messages/hooks/use-threads'
+import type { useThreads } from '@/features/messages/hooks/use-threads'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
 import { Reactions } from '@/features/reactions/components/reactions'
 import { Confirm } from '@/hooks/use-confirm'
@@ -53,6 +53,7 @@ type MessageProps = Pick<
   authorImage: MessageUser['image']
   authorName: MessageUser['name']
   userId?: string
+  threadsRefetch?: ReturnType<typeof useThreads>['refetch']
 }
 
 export const Message = ({
@@ -70,6 +71,7 @@ export const Message = ({
   authorImage,
   authorName,
   userId,
+  threadsRefetch,
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Since this is a common component, having many props is unavoidable.
 }: MessageProps) => {
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
@@ -78,7 +80,6 @@ export const Message = ({
 
   const { parentMessageId, onOpenMessage, onClose } = usePanel()
   const { refetch } = useThreadMessage(parentMessageId, userId ?? undefined)
-  const { refetch: threadsRefetch } = useThreads(parentMessageId, userId)
 
   const [editMessageId, setEditMessageId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -110,14 +111,17 @@ export const Message = ({
         queryKey: [getMessageCacheKey, result.initialValue?.id],
       })
 
-      queryClient.invalidateQueries({
-        queryKey: [getThreadsCacheKey, parentMessageId],
-      })
-
       setEditMessageId(null)
 
       await refetch()
-      await threadsRefetch()
+
+      if (threadsRefetch) {
+        queryClient.invalidateQueries({
+          queryKey: [getThreadsCacheKey, parentMessageId],
+        })
+
+        await threadsRefetch()
+      }
     })
   }
 
@@ -147,11 +151,13 @@ export const Message = ({
 
       toast.success('Message deleted')
 
-      queryClient.invalidateQueries({
-        queryKey: [getThreadsCacheKey, parentMessageId],
-      })
+      if (threadsRefetch) {
+        queryClient.invalidateQueries({
+          queryKey: [getThreadsCacheKey, parentMessageId],
+        })
 
-      await threadsRefetch()
+        await threadsRefetch()
+      }
 
       if (parentMessageId === result.initialValue.id) {
         queryClient.invalidateQueries({
@@ -181,11 +187,13 @@ export const Message = ({
         queryKey: [getChannelMessagesCacheKey, params.channelId],
       })
 
-      queryClient.invalidateQueries({
-        queryKey: [getThreadsCacheKey, parentMessageId],
-      })
+      if (threadsRefetch) {
+        queryClient.invalidateQueries({
+          queryKey: [getThreadsCacheKey, parentMessageId],
+        })
 
-      await threadsRefetch()
+        await threadsRefetch()
+      }
 
       if (parentMessageId && parentMessageId === id) {
         queryClient.invalidateQueries({
@@ -271,6 +279,7 @@ export const Message = ({
                 reactions={reactions}
                 messageId={id}
                 currentUserId={userId}
+                threadsRefetch={threadsRefetch}
               />
             </div>
           )}
@@ -368,6 +377,7 @@ export const Message = ({
               reactions={reactions}
               messageId={id}
               currentUserId={userId}
+              threadsRefetch={threadsRefetch}
             />
           </div>
         )}

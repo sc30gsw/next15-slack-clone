@@ -18,8 +18,14 @@ type VirtuosoThreadsProps = {
 export const VirtuosoThreads = ({ userId, variant }: VirtuosoThreadsProps) => {
   const { parentMessageId } = usePanel()
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useThreads(parentMessageId, userId)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    refetch,
+  } = useThreads(parentMessageId, userId)
 
   if (isLoading) {
     return <MessageListLoader />
@@ -93,6 +99,7 @@ export const VirtuosoThreads = ({ userId, variant }: VirtuosoThreadsProps) => {
                   reactions={thread.reactions}
                   hideThreadButton={variant === 'thread'}
                   userId={userId}
+                  threadsRefetch={refetch}
                 />
               )
             })}
