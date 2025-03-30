@@ -51,7 +51,6 @@ const app = new Hono()
 
     const messagesWithReaction = pipe(
       messagesWithThreads,
-      // filter((message) => message.parentMessageId !== null),
       map((message) => {
         const reactions = message.reactions
         const reactionsWithMemberIds = pipe(
