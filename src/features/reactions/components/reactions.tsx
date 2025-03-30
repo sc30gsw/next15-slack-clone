@@ -5,9 +5,11 @@ import { Hint } from '@/components/ui/hint'
 import {
   getChannelMessagesCacheKey,
   getMessageCacheKey,
+  getThreadsCacheKey,
 } from '@/constants/cache-keys'
 import { usePanel } from '@/features/messages/hooks/use-panel'
 import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
+import type { useThreads } from '@/features/messages/hooks/use-threads'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
@@ -25,12 +27,14 @@ type ReactionsProps = {
   >['messages'][number]['reactions']
   messageId: string
   currentUserId?: string
+  threadsRefetch?: ReturnType<typeof useThreads>['refetch']
 }
 
 export const Reactions = ({
   reactions,
   messageId,
   currentUserId,
+  threadsRefetch,
 }: ReactionsProps) => {
   const [isPending, startTransition] = useTransition()
 
@@ -62,6 +66,14 @@ export const Reactions = ({
       queryClient.invalidateQueries({
         queryKey: [getChannelMessagesCacheKey, params.channelId],
       })
+
+      if (threadsRefetch) {
+        queryClient.invalidateQueries({
+          queryKey: [getThreadsCacheKey, parentMessageId],
+        })
+
+        await threadsRefetch()
+      }
 
       if (parentMessageId && parentMessageId === messageId) {
         queryClient.invalidateQueries({

@@ -2,7 +2,7 @@ import { MESSAGE_LIMIT } from '@/constants'
 import { db } from '@/db/db'
 import { type SelectReaction, messages } from '@/db/schema'
 import { sessionMiddleware } from '@/lib/auth/session-middleware'
-import { eq } from 'drizzle-orm'
+import { count, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { map, pipe, reduce } from 'remeda'
 
@@ -17,18 +17,27 @@ const app = new Hono()
       limit: MESSAGE_LIMIT,
       offset: Number(offset),
       with: {
-        threads: {
-          with: {
-            user: true,
-          },
-        },
         reactions: true,
         member: true,
         user: true,
       },
     })
 
-    const messagesWithReaction = messageList.map((message) => {
+    const messagesWithThreads = await Promise.all(
+      messageList.map(async (message) => {
+        const threadCount = await db
+          .select({ count: count() })
+          .from(messages)
+          .where(eq(messages.parentMessageId, message.id))
+
+        return {
+          ...message,
+          threadCount,
+        }
+      }),
+    )
+
+    const messagesWithReaction = messagesWithThreads.map((message) => {
       const reactions = message.reactions
       const reactionsWithMemberIds = pipe(
         reactions,
@@ -73,11 +82,6 @@ const app = new Hono()
     const message = await db.query.messages.findFirst({
       where: eq(messages.id, messageId),
       with: {
-        threads: {
-          with: {
-            user: true,
-          },
-        },
         reactions: true,
         member: true,
         user: true,
@@ -85,7 +89,7 @@ const app = new Hono()
     })
 
     if (!message) {
-      return c.json({ message: null }, 200)
+      return c.json({ message: null }, 207)
     }
 
     const reactions = message.reactions
@@ -122,6 +126,87 @@ const app = new Hono()
       { message: { ...message, reactions: reactionsWithMemberIds } },
       200,
     )
+  })
+  .get('/threads/:messageId', sessionMiddleware, async (c) => {
+    const messageId = c.req.param('messageId')
+
+    const message = await db.query.messages.findFirst({
+      where: eq(messages.id, messageId),
+      columns: {
+        id: true,
+      },
+    })
+
+    if (!message) {
+      return c.json({ error: { message: 'message not found' } }, 404)
+    }
+
+    const { offset } = c.req.query()
+
+    const threads = await db.query.messages.findMany({
+      where: eq(messages.parentMessageId, messageId),
+      orderBy: (messages, { asc }) => [asc(messages.createdAt)],
+      limit: MESSAGE_LIMIT,
+      offset: Number(offset),
+      with: {
+        user: true,
+        reactions: true,
+        member: true,
+      },
+    })
+
+    const threadsWithChildThreads = await Promise.all(
+      threads.map(async (thread) => {
+        const threadCount = await db
+          .select({ count: count() })
+          .from(messages)
+          .where(eq(messages.parentMessageId, thread.id))
+
+        return {
+          ...thread,
+          threadCount,
+        }
+      }),
+    )
+
+    const threadsWithReaction = threadsWithChildThreads.map((thread) => {
+      const reactions = thread.reactions
+      const reactionsWithMemberIds = pipe(
+        reactions,
+        map((reaction) => {
+          return {
+            ...reaction,
+            count: reactions.filter((r) => r.value === reaction.value).length,
+          }
+        }),
+        reduce(
+          (acc, reaction) => {
+            const existingReaction = acc.find((r) => r.value === reaction.value)
+
+            if (existingReaction) {
+              existingReaction.memberIds = Array.from(
+                new Set([...existingReaction.memberIds, reaction.userId]),
+              )
+            } else {
+              acc.push({
+                ...reaction,
+                memberIds: [reaction.userId],
+              })
+            }
+
+            return acc
+          },
+          [] as Array<SelectReaction & { count: number; memberIds: string[] }>,
+        ),
+      )
+
+      return {
+        ...thread,
+        reactions: reactionsWithMemberIds,
+      }
+    })
+
+    return c.json({ threads: threadsWithReaction }, 200)
   })
 
 export default app
