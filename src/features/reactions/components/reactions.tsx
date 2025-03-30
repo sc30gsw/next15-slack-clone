@@ -27,7 +27,7 @@ type ReactionsProps = {
   >['messages'][number]['reactions']
   messageId: string
   currentUserId?: string
-  threadsRefetch?: () => ReturnType<typeof useThreads>['refetch']
+  threadsRefetch?: ReturnType<typeof useThreads>['refetch']
 }
 
 export const Reactions = ({
