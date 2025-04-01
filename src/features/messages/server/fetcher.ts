@@ -27,6 +27,31 @@ export const getChannelMessages = async (
   return res.messages
 }
 
+export const getConversationMessages = async (
+  req: InferRequestType<
+    (typeof client.api.messages.conversations)[':conversationId']['$get']
+  > &
+    Partial<Record<'userId', string>>,
+  offset: number,
+) => {
+  const url = client.api.messages.conversations[':conversationId'].$url({
+    param: req.param,
+  })
+  url.searchParams.set('offset', offset.toString())
+  type ResType = InferResponseType<
+    (typeof client.api.messages.conversations)[':conversationId']['$get'],
+    200
+  >
+
+  const res = await fetcher<ResType>(url, {
+    headers: {
+      Authorization: req.userId ?? '',
+    },
+  })
+
+  return res.messages
+}
+
 export const getMessage = async (
   req: InferRequestType<(typeof client.api.messages)[':messageId']['$get']> &
     Partial<Record<'userId', string>>,
