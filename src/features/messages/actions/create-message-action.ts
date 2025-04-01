@@ -87,7 +87,7 @@ export const createMessageAction = async (data: CreateMessageInput) => {
     imageUrl = null
   }
 
-  let conversationId: string | null = null
+  let conversationId: string | undefined = data.conversationId
 
   // Only possible if we are replying in a thread in 1:1 conversation
   if (!(data.conversationId || data.channelId) && data.parentMessageId) {
@@ -123,5 +123,9 @@ export const createMessageAction = async (data: CreateMessageInput) => {
 
   return {
     status: 'success',
+    initialValue: {
+      messageId: data.parentMessageId,
+      conversationId,
+    },
   }
 }

@@ -82,6 +82,7 @@ export const toggleReactionAction = async (data: ToggleReactionInput) => {
       status: 'success',
       initialValue: {
         messageId: message.id,
+        conversationId: message.conversationId,
       },
     }
   }
@@ -99,6 +100,7 @@ export const toggleReactionAction = async (data: ToggleReactionInput) => {
     status: 'success',
     initialValue: {
       messageId: message.id,
+      conversationId: message.conversationId,
     },
   }
 }
