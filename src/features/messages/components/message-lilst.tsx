@@ -9,13 +9,11 @@ import { Suspense } from 'react'
 type MessageListProps = {
   workspaceId: string
   channelId: string
-  variant?: 'channel' | 'thread'
 }
 
 export const MessageList = async ({
   workspaceId,
   channelId,
-  variant = 'channel',
 }: MessageListProps) => {
   const session = await getSession()
 
@@ -26,28 +24,26 @@ export const MessageList = async ({
 
   return (
     <div className="flex-1 flex flex-col-reverse pb-4 overflow-y-auto message-scrollbar">
-      <VirtuosoMessageList userId={session?.user?.id} variant={variant} />
-      {variant === 'channel' && (
-        <Suspense
-          fallback={
-            <div className="mt-22 mx-5 mb-4">
-              <Skeleton className="h-8 w-30 mb-2" />
-              <Skeleton className="h-6 w-4/5" />
-            </div>
-          }
-        >
-          {channelPromise.then(
-            (channel) =>
-              channel.name &&
-              channel.createdAt && (
-                <ChannelHero
-                  name={channel.name}
-                  creationTime={channel.createdAt}
-                />
-              ),
-          )}
-        </Suspense>
-      )}
+      <VirtuosoMessageList userId={session?.user?.id} />
+      <Suspense
+        fallback={
+          <div className="mt-22 mx-5 mb-4">
+            <Skeleton className="h-8 w-30 mb-2" />
+            <Skeleton className="h-6 w-4/5" />
+          </div>
+        }
+      >
+        {channelPromise.then(
+          (channel) =>
+            channel.name &&
+            channel.createdAt && (
+              <ChannelHero
+                name={channel.name}
+                creationTime={channel.createdAt}
+              />
+            ),
+        )}
+      </Suspense>
     </div>
   )
 }

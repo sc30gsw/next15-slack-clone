@@ -2,15 +2,10 @@
 
 import { EmojiPopover } from '@/components/ui/emoji-popover'
 import { Hint } from '@/components/ui/hint'
-import {
-  getChannelMessagesCacheKey,
-  getMessageCacheKey,
-  getThreadsCacheKey,
-} from '@/constants/cache-keys'
+import { getMessageCacheKey, getThreadsCacheKey } from '@/constants/cache-keys'
 import { usePanel } from '@/features/messages/hooks/use-panel'
-import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
-import type { useThreads } from '@/features/messages/hooks/use-threads'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
+import { reactionRevalidate } from '@/features/reactions/utils/reaction-revalidate'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
 import { IconMoodPlus } from '@tabler/icons-react'
@@ -27,14 +22,16 @@ type ReactionsProps = {
   >['messages'][number]['reactions']
   messageId: string
   currentUserId?: string
-  threadsRefetch?: ReturnType<typeof useThreads>['refetch']
+  isThreadCache?: boolean
+  isConversationCache?: boolean
 }
 
 export const Reactions = ({
   reactions,
   messageId,
   currentUserId,
-  threadsRefetch,
+  isThreadCache,
+  isConversationCache,
 }: ReactionsProps) => {
   const [isPending, startTransition] = useTransition()
 
@@ -42,10 +39,6 @@ export const Reactions = ({
   const queryClient = useQueryClient()
 
   const { parentMessageId } = usePanel()
-  const { refetch } = useThreadMessage(
-    parentMessageId,
-    currentUserId ?? undefined,
-  )
 
   if (reactions.length === 0 || !currentUserId) {
     return null
@@ -63,16 +56,24 @@ export const Reactions = ({
         return
       }
 
-      queryClient.invalidateQueries({
-        queryKey: [getChannelMessagesCacheKey, params.channelId],
-      })
+      const listDataRevalidate = () => {
+        if (isConversationCache) {
+          reactionRevalidate(
+            'conversation',
+            queryClient,
+            result.initialValue?.conversationId ?? '',
+          )
+        } else {
+          reactionRevalidate('messages', queryClient, params.channelId)
+        }
+      }
 
-      if (threadsRefetch) {
+      listDataRevalidate()
+
+      if (isThreadCache) {
         queryClient.invalidateQueries({
           queryKey: [getThreadsCacheKey, parentMessageId],
         })
-
-        await threadsRefetch()
       }
 
       if (parentMessageId && parentMessageId === messageId) {
@@ -80,7 +81,7 @@ export const Reactions = ({
           queryKey: [getMessageCacheKey, result.initialValue?.messageId],
         })
 
-        await refetch()
+        listDataRevalidate()
       }
     })
   }

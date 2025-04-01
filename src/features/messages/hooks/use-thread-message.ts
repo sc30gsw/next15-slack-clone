@@ -6,7 +6,7 @@ export const useThreadMessage = (
   parentMessageId: string | null,
   userId?: string,
 ) => {
-  const { isError, data, refetch, isLoading } = useQuery({
+  const { isError, data, isLoading } = useQuery({
     queryKey: [getMessageCacheKey, parentMessageId],
     queryFn: () =>
       getMessage({ param: { messageId: parentMessageId ?? '' }, userId }),
@@ -15,7 +15,6 @@ export const useThreadMessage = (
   return {
     isError,
     data,
-    refetch,
     isLoading,
   } as const
 }

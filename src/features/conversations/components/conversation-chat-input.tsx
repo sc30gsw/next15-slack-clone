@@ -1,7 +1,7 @@
 'use client'
 
 import { Editor } from '@/components/ui/editor'
-import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
+import { getConversationMessagesCacheKey } from '@/constants/cache-keys'
 import { createMessageAction } from '@/features/messages/actions/create-message-action'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -10,8 +10,11 @@ import type Quill from 'quill'
 import { useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
-export const ChatInput = ({ placeholder }: Record<'placeholder', string>) => {
-  const params = useParams<Record<'workspaceId' | 'channelId', string>>()
+export const ConversationChatInput = ({
+  placeholder,
+  conversationId,
+}: Record<'placeholder' | 'conversationId', string>) => {
+  const params = useParams<Record<'workspaceId' | 'memberId', string>>()
   const queryClient = useQueryClient()
 
   const editorRef = useRef<Quill | null>(null)
@@ -30,7 +33,7 @@ export const ChatInput = ({ placeholder }: Record<'placeholder', string>) => {
         body,
         image,
         workspaceId: params.workspaceId,
-        channelId: params.channelId,
+        conversationId,
       })
 
       if (result.status === 'error') {
@@ -42,7 +45,7 @@ export const ChatInput = ({ placeholder }: Record<'placeholder', string>) => {
       editorRef?.current?.enable(true)
 
       queryClient.invalidateQueries({
-        queryKey: [getChannelMessagesCacheKey, params.channelId],
+        queryKey: [getConversationMessagesCacheKey, conversationId],
       })
     })
   }

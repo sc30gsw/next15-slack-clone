@@ -1,24 +1,28 @@
 'use client'
-
+import { useConversationMessages } from '@/features/conversations/hooks/use-conversation-messages'
 import { LoadMoreButton } from '@/features/messages/components/load-more-button'
 import { Message } from '@/features/messages/components/message'
 import { MessageListLoader } from '@/features/messages/components/message-list-loader'
-import { useChannelMessages } from '@/features/messages/hooks/use-channel-messages'
 import { formatDateLabel } from '@/lib/date'
 import { compareDesc, differenceInMinutes, format } from 'date-fns'
-import { useParams } from 'next/navigation'
 import { Virtuoso } from 'react-virtuoso'
 import { filter, groupBy, map, mapValues, pipe, reverse, sort } from 'remeda'
 
 const TIME_THRESHOLD = 5
 
-export const VirtuosoMessageList = ({
-  userId,
-}: Partial<Record<'userId', string>>) => {
-  const params = useParams<Record<'workspaceId' | 'channelId', string>>()
+type VirtuosoConversationMessageListProps = {
+  conversationId: string
+  userId?: string
+  variant?: 'channel' | 'thread' | 'conversation'
+}
 
+export const VirtuosoConversationMessageList = ({
+  conversationId,
+  userId,
+  variant,
+}: VirtuosoConversationMessageListProps) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useChannelMessages(params.channelId, userId)
+    useConversationMessages(conversationId, userId)
 
   if (isLoading) {
     return <MessageListLoader />
@@ -89,6 +93,8 @@ export const VirtuosoMessageList = ({
                   threadCount={message.threadCount[0].count}
                   firstThread={message.firstThread}
                   reactions={message.reactions}
+                  hideThreadButton={variant === 'thread'}
+                  isConversationCache={true}
                   userId={userId}
                 />
               )

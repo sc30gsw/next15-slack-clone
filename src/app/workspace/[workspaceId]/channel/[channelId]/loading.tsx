@@ -2,8 +2,12 @@ import { Loader } from '@/components/justd/ui'
 
 const ChannelIdLoading = () => {
   return (
-    <div className="h-full flex-1 items-center justify-center">
-      <Loader size="medium" intent="secondary" className="animate-spin" />
+    <div className="h-full flex-1 relative">
+      <Loader
+        size="medium"
+        intent="secondary"
+        className="animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      />
     </div>
   )
 }

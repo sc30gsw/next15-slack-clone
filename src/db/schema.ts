@@ -1,6 +1,7 @@
 import { relations, sql } from 'drizzle-orm'
 import {
   type AnySQLiteColumn,
+  foreignKey,
   index,
   integer,
   primaryKey,
@@ -274,12 +275,8 @@ export const conversations = sqliteTable(
     workspaceId: text('workspaceId')
       .notNull()
       .references(() => workspaces.id, { onDelete: 'cascade' }),
-    memberOneId: text('memberOneId').references(() => members.userId, {
-      onDelete: 'cascade',
-    }),
-    memberTwoId: text('memberTwoId').references(() => members.userId, {
-      onDelete: 'cascade',
-    }),
+    memberOneId: text('memberOneId').notNull(),
+    memberTwoId: text('memberTwoId').notNull(),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
       () => new Date(),
@@ -294,6 +291,16 @@ export const conversations = sqliteTable(
       conversation.memberOneId,
       conversation.memberTwoId,
     ),
+    foreignKey({
+      columns: [conversation.memberOneId, conversation.workspaceId],
+      foreignColumns: [members.userId, members.workspaceId],
+      name: 'fk_conversations_memberOne',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [conversation.memberTwoId, conversation.workspaceId],
+      foreignColumns: [members.userId, members.workspaceId],
+      name: 'fk_conversations_memberTwo',
+    }).onDelete('cascade'),
   ],
 )
 

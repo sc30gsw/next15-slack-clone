@@ -16,6 +16,7 @@ const avatar = tv({
       medium: 'size-8 *:size-8',
       large: 'size-10 *:size-10',
       'extra-large': 'size-12 *:size-12',
+      'special-large': 'size-14 *:size-14',
     },
   },
 })

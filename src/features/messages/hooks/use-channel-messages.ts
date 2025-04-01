@@ -1,16 +1,16 @@
 import { MESSAGE_LIMIT } from '@/constants'
-import { getThreadsCacheKey } from '@/constants/cache-keys'
-import { getThreads } from '@/features/messages/server/fetcher'
+import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
+import { getChannelMessages } from '@/features/messages/server/fetcher'
 import { useInfiniteQuery } from '@tanstack/react-query'
 
-export const useThreads = (parentMessageId: string | null, userId?: string) => {
+export const useChannelMessages = (channelId: string, userId?: string) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: [getThreadsCacheKey, parentMessageId],
+      queryKey: [getChannelMessagesCacheKey, channelId],
       queryFn: async ({ pageParam = 0 }) => {
-        return await getThreads(
+        return await getChannelMessages(
           {
-            param: { messageId: parentMessageId ?? '' },
+            param: { channelId },
             userId,
           },
           pageParam,

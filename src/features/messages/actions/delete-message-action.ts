@@ -52,6 +52,7 @@ export const deleteMessageAction = async (
     status: 'success',
     initialValue: {
       id: messageId,
+      conversationId: message.conversationId ?? '',
     },
   } as const satisfies SubmissionResult
 }

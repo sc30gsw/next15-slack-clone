@@ -71,6 +71,7 @@ export const updateMessageAction = async (data: UpdateMessageInput) => {
     status: 'success',
     initialValue: {
       id: result.data.id,
+      conversationId: message.conversationId,
     },
   }
 }
