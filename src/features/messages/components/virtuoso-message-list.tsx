@@ -81,7 +81,6 @@ export const VirtuosoMessageList = ({
                   image={message.image}
                   createdAt={message.createdAt}
                   isUpdated={message.isUpdated}
-                  memberId={message.member.userId}
                   isAuthor={message.userId === userId}
                   authorName={message.user.name}
                   authorImage={message.user.image}
