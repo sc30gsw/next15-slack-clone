@@ -3,7 +3,7 @@ import { Editor } from '@/components/ui/editor'
 import { Hint } from '@/components/ui/hint'
 import { Renderer } from '@/components/ui/renderer'
 import {
-  getChannelMessagesCacheKey,
+  getConversationMessagesCacheKey,
   getMessageCacheKey,
   getThreadsCacheKey,
 } from '@/constants/cache-keys'
@@ -12,10 +12,9 @@ import { updateMessageAction } from '@/features/messages/actions/update-message-
 import { MessageToolbar } from '@/features/messages/components/message-toolbar'
 import { Thumbnail } from '@/features/messages/components/thumbnail'
 import { usePanel } from '@/features/messages/hooks/use-panel'
-import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
-import type { useThreads } from '@/features/messages/hooks/use-threads'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
 import { Reactions } from '@/features/reactions/components/reactions'
+import { reactionRevalidate } from '@/features/reactions/utils/reaction-revalidate'
 import { Confirm } from '@/hooks/use-confirm'
 import { formatFullTime } from '@/lib/date'
 import type { client } from '@/lib/rpc'
@@ -60,7 +59,8 @@ type MessageProps = Pick<
   authorImage: MessageUser['image']
   authorName: MessageUser['name']
   userId?: string
-  threadsRefetch?: ReturnType<typeof useThreads>['refetch']
+  isThreadCache?: boolean
+  isConversationCache?: boolean
 }
 
 export const Message = ({
@@ -79,7 +79,8 @@ export const Message = ({
   authorImage,
   authorName,
   userId,
-  threadsRefetch,
+  isThreadCache,
+  isConversationCache,
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Since this is a common component, having many props is unavoidable.
 }: MessageProps) => {
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
@@ -87,7 +88,6 @@ export const Message = ({
   const queryClient = useQueryClient()
 
   const { parentMessageId, onOpenMessage, onClose } = usePanel()
-  const { refetch } = useThreadMessage(parentMessageId, userId ?? undefined)
 
   const [editMessageId, setEditMessageId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -112,23 +112,31 @@ export const Message = ({
       toast.success('Message updated')
 
       queryClient.invalidateQueries({
-        queryKey: [getChannelMessagesCacheKey, params.channelId],
-      })
-
-      queryClient.invalidateQueries({
         queryKey: [getMessageCacheKey, result.initialValue?.id],
       })
 
+      const listDataRevalidate = () => {
+        if (isConversationCache) {
+          reactionRevalidate(
+            'conversation',
+            queryClient,
+            result.initialValue?.conversationId ?? '',
+          )
+        } else {
+          reactionRevalidate('messages', queryClient, params.channelId)
+        }
+      }
+
+      listDataRevalidate()
+
       setEditMessageId(null)
 
-      await refetch()
-
-      if (threadsRefetch) {
+      if (isThreadCache) {
         queryClient.invalidateQueries({
           queryKey: [getThreadsCacheKey, parentMessageId],
         })
 
-        await threadsRefetch()
+        listDataRevalidate()
       }
     })
   }
@@ -153,18 +161,33 @@ export const Message = ({
         return
       }
 
-      queryClient.invalidateQueries({
-        queryKey: [getChannelMessagesCacheKey, params.channelId],
-      })
-
       toast.success('Message deleted')
 
-      if (threadsRefetch) {
+      const listDataRevalidate = () => {
+        if (isConversationCache) {
+          reactionRevalidate(
+            'conversation',
+            queryClient,
+            result.initialValue?.conversationId ?? '',
+          )
+        } else {
+          reactionRevalidate('messages', queryClient, params.channelId)
+        }
+      }
+
+      listDataRevalidate()
+
+      if (isThreadCache) {
         queryClient.invalidateQueries({
           queryKey: [getThreadsCacheKey, parentMessageId],
         })
 
-        await threadsRefetch()
+        queryClient.invalidateQueries({
+          queryKey: [
+            getConversationMessagesCacheKey,
+            result.initialValue?.conversationId,
+          ],
+        })
       }
 
       if (parentMessageId === result.initialValue.id) {
@@ -172,8 +195,9 @@ export const Message = ({
           queryKey: [getMessageCacheKey, result.initialValue.id],
         })
 
+        listDataRevalidate()
+
         onClose()
-        await refetch()
       }
     })
   }
@@ -191,16 +215,24 @@ export const Message = ({
       }
       toast.success('Reaction added')
 
-      queryClient.invalidateQueries({
-        queryKey: [getChannelMessagesCacheKey, params.channelId],
-      })
+      const listDataRevalidate = () => {
+        if (isConversationCache) {
+          reactionRevalidate(
+            'conversation',
+            queryClient,
+            result.initialValue?.conversationId ?? '',
+          )
+        } else {
+          reactionRevalidate('messages', queryClient, params.channelId)
+        }
+      }
 
-      if (threadsRefetch) {
+      listDataRevalidate()
+
+      if (isThreadCache) {
         queryClient.invalidateQueries({
           queryKey: [getThreadsCacheKey, parentMessageId],
         })
-
-        await threadsRefetch()
       }
 
       if (parentMessageId && parentMessageId === id) {
@@ -208,7 +240,7 @@ export const Message = ({
           queryKey: [getMessageCacheKey, result.initialValue?.messageId],
         })
 
-        await refetch()
+        listDataRevalidate()
       }
     })
   }
@@ -287,8 +319,42 @@ export const Message = ({
                 reactions={reactions}
                 messageId={id}
                 currentUserId={userId}
-                threadsRefetch={threadsRefetch}
+                isThreadCache={isThreadCache}
+                isConversationCache={isConversationCache}
               />
+              {firstThread && (
+                <button
+                  type="button"
+                  className="p-1 flex items-center justify-between text-sm group cursor-pointer hover:border rounded-md transition-colors duration-200 w-55"
+                  onClick={() => onOpenMessage(id)}
+                >
+                  <div className="flex items-center gap-x-2">
+                    <Avatar
+                      size="small"
+                      shape="square"
+                      src={firstThread.user.image}
+                      alt={firstThread.user.name ?? 'Member'}
+                      initials={authorName?.charAt(0).toUpperCase()}
+                      className="bg-sky-500 text-white"
+                    />
+                    <span className="font-bold text-primary group-hover:underline transition-colors duration-200">
+                      {threadCount} reply
+                    </span>
+
+                    <div className="text-gray-500">
+                      <span className="block group-hover:hidden">
+                        {formatDistanceToNow(new Date(firstThread.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                      <span className="hidden group-hover:flex items-center">
+                        View threads
+                      </span>
+                    </div>
+                  </div>
+                  <IconChevronRight className="size-5 hidden group-hover:block" />
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -385,13 +451,14 @@ export const Message = ({
               reactions={reactions}
               messageId={id}
               currentUserId={userId}
-              threadsRefetch={threadsRefetch}
+              isThreadCache={isThreadCache}
+              isConversationCache={isConversationCache}
             />
 
             {firstThread && (
               <button
                 type="button"
-                className="p-1 flex items-center justify-between text-sm group cursor-pointer hover:border rounded-md transition-colors duration-200"
+                className="p-1 flex items-center justify-between text-sm group cursor-pointer hover:border rounded-md transition-colors duration-200 w-55"
                 onClick={() => onOpenMessage(id)}
               >
                 <div className="flex items-center gap-x-2">
