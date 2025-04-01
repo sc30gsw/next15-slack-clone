@@ -1,5 +1,8 @@
 import { Skeleton } from '@/components/justd/ui'
-import { getWorkspaceCurrentMember } from '@/features/members/server/fetcher'
+import {
+  getWorkspaceCurrentMember,
+  getWorkspaceMembers,
+} from '@/features/members/server/fetcher'
 import { SidebarItem } from '@/features/workspaces/components/sidebar-item'
 import { WorkspaceChannels } from '@/features/workspaces/components/workspace-channels'
 import { WorkspaceHeaderContainer } from '@/features/workspaces/components/workspace-header-container'
@@ -15,6 +18,7 @@ import { Suspense } from 'react'
 
 type WorkspaceSidebarProps = {
   workspaceId: string
+  memberId?: string
 }
 
 export const WorkspaceSidebar = async ({
@@ -35,6 +39,11 @@ export const WorkspaceSidebar = async ({
       </div>
     )
   }
+
+  const membersPromise = getWorkspaceMembers({
+    param: { workspaceId },
+    userId: session?.user?.id,
+  })
 
   return (
     <div className="flex flex-col bg-[#5E2C5F] h-full">
@@ -93,7 +102,7 @@ export const WorkspaceSidebar = async ({
             </div>
           }
         >
-          <WorkspaceMembers workspaceId={workspaceId} />
+          <WorkspaceMembers membersPromise={membersPromise} />
         </Suspense>
       </WorkspaceSection>
     </div>

@@ -1,20 +1,15 @@
-import { getWorkspaceMembers } from '@/features/members/server/fetcher'
+'use client'
+
+import type { getWorkspaceMembers } from '@/features/members/server/fetcher'
 import { UserItem } from '@/features/workspaces/components/user-item'
-import { getSession } from '@/lib/auth/session'
+import { useParams } from 'next/navigation'
+import { use } from 'react'
 
-type WorkspaceMembersProps = {
-  workspaceId: string
-}
-
-export const WorkspaceMembers = async ({
-  workspaceId,
-}: WorkspaceMembersProps) => {
-  const session = await getSession()
-
-  const members = await getWorkspaceMembers({
-    param: { workspaceId },
-    userId: session?.user?.id,
-  })
+export const WorkspaceMembers = ({
+  membersPromise,
+}: Record<'membersPromise', ReturnType<typeof getWorkspaceMembers>>) => {
+  const members = use(membersPromise)
+  const params = useParams<{ workspaceId: string; memberId?: string }>()
 
   return members.map((member) => (
     <UserItem
@@ -22,6 +17,7 @@ export const WorkspaceMembers = async ({
       id={member.user?.id}
       label={member.user?.name}
       image={member.user?.image}
+      variant={member.userId === params.memberId ? 'active' : 'default'}
     />
   ))
 }
