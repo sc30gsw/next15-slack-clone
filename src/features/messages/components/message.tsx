@@ -2,31 +2,18 @@ import { Avatar } from '@/components/justd/ui'
 import { Editor } from '@/components/ui/editor'
 import { Hint } from '@/components/ui/hint'
 import { Renderer } from '@/components/ui/renderer'
-import {
-  getConversationMessagesCacheKey,
-  getMessageCacheKey,
-  getThreadsCacheKey,
-} from '@/constants/cache-keys'
-import { deleteMessageAction } from '@/features/messages/actions/delete-message-action'
-import { updateMessageAction } from '@/features/messages/actions/update-message-action'
+import { FirstThreadButton } from '@/features/messages/components/first-thread-button'
 import { MessageToolbar } from '@/features/messages/components/message-toolbar'
 import { Thumbnail } from '@/features/messages/components/thumbnail'
-import { usePanel } from '@/features/messages/hooks/use-panel'
-import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
+import { useMessage } from '@/features/messages/hooks/use-message'
+import type { MessageResponse } from '@/features/messages/types'
 import { Reactions } from '@/features/reactions/components/reactions'
-import { reactionRevalidate } from '@/features/reactions/utils/reaction-revalidate'
-import { Confirm } from '@/hooks/use-confirm'
 import { formatFullTime } from '@/lib/date'
 import type { client } from '@/lib/rpc'
 import { cn } from '@/utils/classes'
-import { useQueryClient } from '@tanstack/react-query'
-import { format, formatDistanceToNow } from 'date-fns'
+import { format } from 'date-fns'
 import type { InferResponseType } from 'hono'
-import { IconChevronRight } from 'justd-icons'
 import Image from 'next/image'
-import { useParams } from 'next/navigation'
-import { useState, useTransition } from 'react'
-import { toast } from 'sonner'
 
 type MessageMember = InferResponseType<
   (typeof client.api.messages.channel)[':channelId']['$get'],
@@ -39,10 +26,7 @@ type MessageUser = InferResponseType<
 >['messages'][number]['user']
 
 type MessageProps = Pick<
-  InferResponseType<
-    (typeof client.api.messages.channel)[':channelId']['$get'],
-    200
-  >['messages'][number],
+  MessageResponse,
   | 'id'
   | 'body'
   | 'image'
@@ -83,167 +67,16 @@ export const Message = ({
   isConversationCache,
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Since this is a common component, having many props is unavoidable.
 }: MessageProps) => {
-  const params = useParams<Record<'workspaceId' | 'channelId', string>>()
-
-  const queryClient = useQueryClient()
-
-  const { parentMessageId, onOpenMessage, onClose } = usePanel()
-
-  const [editMessageId, setEditMessageId] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
-  const [isDeletionPending, startDeletionTransition] = useTransition()
-
-  const isEditing = editMessageId === id
-
-  const handleUpdate = ({ body }: Record<'body', string>) => {
-    startTransition(async () => {
-      const result = await updateMessageAction({
-        id,
-        body,
-        workspaceId: params.workspaceId,
-        channelId: params.channelId,
-      })
-
-      if (result.status === 'error') {
-        toast.error('Failed to update message')
-        return
-      }
-
-      toast.success('Message updated')
-
-      queryClient.invalidateQueries({
-        queryKey: [getMessageCacheKey, result.initialValue?.id],
-      })
-
-      const listDataRevalidate = () => {
-        if (isConversationCache) {
-          reactionRevalidate(
-            'conversation',
-            queryClient,
-            result.initialValue?.conversationId ?? '',
-          )
-        } else {
-          reactionRevalidate('messages', queryClient, params.channelId)
-        }
-      }
-
-      listDataRevalidate()
-
-      setEditMessageId(null)
-
-      if (isThreadCache) {
-        queryClient.invalidateQueries({
-          queryKey: [getThreadsCacheKey, parentMessageId],
-        })
-
-        listDataRevalidate()
-      }
-    })
-  }
-
-  const handleDelete = async () => {
-    const ok = await Confirm.call({
-      title: 'Delete message?',
-      message:
-        'Are you sure you want to delete this message? This cannot be undone.',
-    })
-
-    if (!ok) {
-      return
-    }
-
-    startDeletionTransition(async () => {
-      const result = await deleteMessageAction(id, params.workspaceId)
-
-      if (result.status === 'error') {
-        toast.error('Failed to delete message')
-
-        return
-      }
-
-      toast.success('Message deleted')
-
-      const listDataRevalidate = () => {
-        if (isConversationCache) {
-          reactionRevalidate(
-            'conversation',
-            queryClient,
-            result.initialValue?.conversationId ?? '',
-          )
-        } else {
-          reactionRevalidate('messages', queryClient, params.channelId)
-        }
-      }
-
-      listDataRevalidate()
-
-      if (isThreadCache) {
-        queryClient.invalidateQueries({
-          queryKey: [getThreadsCacheKey, parentMessageId],
-        })
-
-        queryClient.invalidateQueries({
-          queryKey: [
-            getConversationMessagesCacheKey,
-            result.initialValue?.conversationId,
-          ],
-        })
-      }
-
-      if (parentMessageId === result.initialValue.id) {
-        queryClient.invalidateQueries({
-          queryKey: [getMessageCacheKey, result.initialValue.id],
-        })
-
-        listDataRevalidate()
-
-        onClose()
-      }
-    })
-  }
-
-  const toggleReaction = (value: string) => {
-    startTransition(async () => {
-      const result = await toggleReactionAction({
-        value,
-        messageId: id,
-      })
-
-      if (result.status === 'error') {
-        toast.error('Failed to toggle reaction')
-        return
-      }
-      toast.success('Reaction added')
-
-      const listDataRevalidate = () => {
-        if (isConversationCache) {
-          reactionRevalidate(
-            'conversation',
-            queryClient,
-            result.initialValue?.conversationId ?? '',
-          )
-        } else {
-          reactionRevalidate('messages', queryClient, params.channelId)
-        }
-      }
-
-      listDataRevalidate()
-
-      if (isThreadCache) {
-        queryClient.invalidateQueries({
-          queryKey: [getThreadsCacheKey, parentMessageId],
-        })
-      }
-
-      if (parentMessageId && parentMessageId === id) {
-        queryClient.invalidateQueries({
-          queryKey: [getMessageCacheKey, result.initialValue?.messageId],
-        })
-
-        listDataRevalidate()
-      }
-    })
-  }
+  const {
+    isEditing,
+    setEditMessageId,
+    isPending,
+    isDeletionPending,
+    onOpenMessage,
+    handleUpdate,
+    handleDelete,
+    toggleReaction,
+  } = useMessage(id, !!isConversationCache, !!isThreadCache)
 
   if (isCompact) {
     return (
@@ -323,37 +156,13 @@ export const Message = ({
                 isConversationCache={isConversationCache}
               />
               {firstThread && (
-                <button
-                  type="button"
-                  className="p-1 flex items-center justify-between text-sm group cursor-pointer hover:border rounded-md transition-colors duration-200 w-55"
-                  onClick={() => onOpenMessage(id)}
-                >
-                  <div className="flex items-center gap-x-2">
-                    <Avatar
-                      size="small"
-                      shape="square"
-                      src={firstThread.user.image}
-                      alt={firstThread.user.name ?? 'Member'}
-                      initials={authorName?.charAt(0).toUpperCase()}
-                      className="bg-sky-500 text-white"
-                    />
-                    <span className="font-bold text-primary group-hover:underline transition-colors duration-200">
-                      {threadCount} reply
-                    </span>
-
-                    <div className="text-gray-500">
-                      <span className="block group-hover:hidden">
-                        {formatDistanceToNow(new Date(firstThread.createdAt), {
-                          addSuffix: true,
-                        })}
-                      </span>
-                      <span className="hidden group-hover:flex items-center">
-                        View threads
-                      </span>
-                    </div>
-                  </div>
-                  <IconChevronRight className="size-5 hidden group-hover:block" />
-                </button>
+                <FirstThreadButton
+                  id={id}
+                  name={firstThread.user.name}
+                  image={firstThread.user.image}
+                  createdAt={firstThread.createdAt}
+                  threadCount={threadCount ?? 0}
+                />
               )}
             </div>
           )}
@@ -456,37 +265,13 @@ export const Message = ({
             />
 
             {firstThread && (
-              <button
-                type="button"
-                className="p-1 flex items-center justify-between text-sm group cursor-pointer hover:border rounded-md transition-colors duration-200 w-55"
-                onClick={() => onOpenMessage(id)}
-              >
-                <div className="flex items-center gap-x-2">
-                  <Avatar
-                    size="small"
-                    shape="square"
-                    src={firstThread.user.image}
-                    alt={firstThread.user.name ?? 'Member'}
-                    initials={authorName?.charAt(0).toUpperCase()}
-                    className="bg-sky-500 text-white"
-                  />
-                  <span className="font-bold text-primary group-hover:underline transition-colors duration-200">
-                    {threadCount} reply
-                  </span>
-
-                  <div className="text-gray-500">
-                    <span className="block group-hover:hidden">
-                      {formatDistanceToNow(new Date(firstThread.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </span>
-                    <span className="hidden group-hover:flex items-center">
-                      View threads
-                    </span>
-                  </div>
-                </div>
-                <IconChevronRight className="size-5 hidden group-hover:block" />
-              </button>
+              <FirstThreadButton
+                id={id}
+                name={firstThread.user.name}
+                image={firstThread.user.image}
+                createdAt={firstThread.createdAt}
+                threadCount={threadCount ?? 0}
+              />
             )}
           </div>
         )}
