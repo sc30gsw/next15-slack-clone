@@ -7,11 +7,17 @@ import { VirtuosoThreads } from '@/features/messages/components/virtuoso-threads
 import { usePanel } from '@/features/messages/hooks/use-panel'
 import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
 import { IconTriangleExclamation } from 'justd-icons'
+import { useParams } from 'next/navigation'
 
 export const ThreadMessage = ({
   userId,
 }: Partial<Record<'userId', string>>) => {
   const { parentMessageId } = usePanel()
+  const params = useParams<{
+    workspaceId: string
+    channelId?: string
+    memberId?: string
+  }>()
   const {
     isError,
     data: message,
@@ -65,13 +71,15 @@ export const ThreadMessage = ({
           hideThreadButton={true}
           userId={userId}
           firstThread={undefined}
+          isThreadCache={!!params.channelId}
+          isConversationCache={!!params.memberId}
         />
       </div>
 
       <VirtuosoThreads userId={userId} />
 
       <div className="px-4">
-        <ThreadInput userId={userId} />
+        <ThreadInput />
       </div>
     </div>
   )
