@@ -27,7 +27,6 @@ const ChannelIdPage = async ({
           <ChannelHeader workspaceId={workspaceId} channelId={channelId} />
         </Suspense>
       </div>
-      <div className="flex-1" />
       <MessageList workspaceId={workspaceId} channelId={channelId} />
       <Suspense fallback={<Skeleton className="h-39 w-248 mx-5 mb-2" />}>
         {channelPromise.then((channel) => (
