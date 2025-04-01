@@ -10,9 +10,7 @@ import type Quill from 'quill'
 import { useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
-type ChatInputProps = { placeholder: string }
-
-export const ChatInput = ({ placeholder }: ChatInputProps) => {
+export const ChatInput = ({ placeholder }: Record<'placeholder', string>) => {
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
   const queryClient = useQueryClient()
 
