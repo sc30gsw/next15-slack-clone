@@ -62,7 +62,6 @@ export const ThreadMessage = ({
           image={message.image}
           createdAt={message.createdAt}
           isUpdated={message.isUpdated}
-          memberId={message.member.userId}
           isAuthor={message.userId === userId}
           authorName={message.user.name}
           authorImage={message.user.image}
@@ -75,9 +74,7 @@ export const ThreadMessage = ({
           isConversationCache={!!params.memberId}
         />
       </div>
-
       <VirtuosoThreads userId={userId} />
-
       <div className="px-4">
         <ThreadInput />
       </div>

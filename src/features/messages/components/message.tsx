@@ -15,11 +15,6 @@ import { format } from 'date-fns'
 import type { InferResponseType } from 'hono'
 import Image from 'next/image'
 
-type MessageMember = InferResponseType<
-  (typeof client.api.messages.channel)[':channelId']['$get'],
-  200
->['messages'][number]['member']
-
 type MessageUser = InferResponseType<
   (typeof client.api.messages.channel)[':channelId']['$get'],
   200
@@ -35,7 +30,6 @@ type MessageProps = Pick<
   | 'reactions'
   | 'firstThread'
 > & {
-  memberId: MessageMember['userId']
   isAuthor: boolean
   threadCount?: number
   isCompact?: boolean
@@ -56,7 +50,6 @@ export const Message = ({
   threadCount,
   firstThread,
   reactions,
-  memberId,
   isAuthor,
   isCompact,
   hideThreadButton,
