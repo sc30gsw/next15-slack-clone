@@ -1,13 +1,10 @@
 'use client'
 
-import { MESSAGE_LIMIT } from '@/constants'
-import { getChannelMessagesCacheKey } from '@/constants/cache-keys'
 import { LoadMoreButton } from '@/features/messages/components/load-more-button'
 import { Message } from '@/features/messages/components/message'
 import { MessageListLoader } from '@/features/messages/components/message-list-loader'
-import { getChannelMessages } from '@/features/messages/server/fetcher'
+import { useChannelMessages } from '@/features/messages/hooks/use-channel-messages'
 import { formatDateLabel } from '@/lib/date'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { compareDesc, differenceInMinutes, format } from 'date-fns'
 import { useParams } from 'next/navigation'
 import { Virtuoso } from 'react-virtuoso'
@@ -15,36 +12,13 @@ import { filter, groupBy, map, mapValues, pipe, reverse, sort } from 'remeda'
 
 const TIME_THRESHOLD = 5
 
-type VirtuosoMessageListProps = {
-  userId?: string
-  variant?: 'channel' | 'thread'
-}
-
 export const VirtuosoMessageList = ({
   userId,
-  variant,
-}: VirtuosoMessageListProps) => {
+}: Partial<Record<'userId', string>>) => {
   const params = useParams<Record<'workspaceId' | 'channelId', string>>()
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
-      queryKey: [getChannelMessagesCacheKey, params.channelId],
-      queryFn: async ({ pageParam = 0 }) => {
-        return await getChannelMessages(
-          {
-            param: { channelId: params.channelId },
-            userId,
-          },
-          pageParam,
-        )
-      },
-      getNextPageParam: (lastPage, allPages) => {
-        return lastPage.length === MESSAGE_LIMIT
-          ? allPages.length * MESSAGE_LIMIT
-          : undefined
-      },
-      initialPageParam: 0,
-    })
+    useChannelMessages(params.channelId, userId)
 
   if (isLoading) {
     return <MessageListLoader />
@@ -115,7 +89,6 @@ export const VirtuosoMessageList = ({
                   threadCount={message.threadCount[0].count}
                   firstThread={message.firstThread}
                   reactions={message.reactions}
-                  hideThreadButton={variant === 'thread'}
                   userId={userId}
                 />
               )
