@@ -41,6 +41,7 @@ export const UserItem = ({ id, image, label, variant }: UserItemProps) => {
       <Link
         href={`/workspace/${params.workspaceId}/member/${id}`}
         className={link()}
+        prefetch={true}
       >
         <Avatar
           src={image}
