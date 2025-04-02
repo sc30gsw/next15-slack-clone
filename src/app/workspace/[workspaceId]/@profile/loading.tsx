@@ -1,6 +1,6 @@
 import { Loader } from '@/components/justd/ui'
 
-const ProfileLoading = () => {
+const ProfileLoadingPage = () => {
   return (
     <div className="h-full flex-1 relative">
       <Loader
@@ -12,4 +12,4 @@ const ProfileLoading = () => {
   )
 }
 
-export default ProfileLoading
+export default ProfileLoadingPage

@@ -1,5 +1,6 @@
 import { PanelCloseButton } from '@/components/ui/panel-close-button'
 import { ProfileContentContainer } from '@/features/members/components/profile-content-container'
+import { ProfileLoading } from '@/features/members/components/profile-loading'
 import { Suspense } from 'react'
 
 export const Profile = () => {
@@ -9,7 +10,7 @@ export const Profile = () => {
         <p className="text-lg font-bold">Profile</p>
         <PanelCloseButton />
       </div>
-      <Suspense>
+      <Suspense fallback={<ProfileLoading />}>
         <ProfileContentContainer />
       </Suspense>
     </div>
