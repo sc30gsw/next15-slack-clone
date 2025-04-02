@@ -2,8 +2,8 @@ import { Avatar } from '@/components/justd/ui'
 import { Editor } from '@/components/ui/editor'
 import { Hint } from '@/components/ui/hint'
 import { Renderer } from '@/components/ui/renderer'
-import { FirstThreadButton } from '@/features/messages/components/first-thread-button'
 import { MessageToolbar } from '@/features/messages/components/message-toolbar'
+import { ThreadBar } from '@/features/messages/components/thread-bar'
 import { Thumbnail } from '@/features/messages/components/thumbnail'
 import { useMessage } from '@/features/messages/hooks/use-message'
 import type { MessageResponse } from '@/features/messages/types'
@@ -148,15 +148,13 @@ export const Message = ({
                 isThreadCache={isThreadCache}
                 isConversationCache={isConversationCache}
               />
-              {firstThread && (
-                <FirstThreadButton
-                  id={id}
-                  name={firstThread.user.name}
-                  image={firstThread.user.image}
-                  createdAt={firstThread.createdAt}
-                  threadCount={threadCount ?? 0}
-                />
-              )}
+              <ThreadBar
+                count={threadCount ?? 0}
+                image={firstThread?.user.image ?? ''}
+                name={firstThread?.user.name ?? ''}
+                timestamp={firstThread?.createdAt}
+                onClick={() => onOpenMessage(id)}
+              />
             </div>
           )}
         </div>
@@ -256,16 +254,13 @@ export const Message = ({
               isThreadCache={isThreadCache}
               isConversationCache={isConversationCache}
             />
-
-            {firstThread && (
-              <FirstThreadButton
-                id={id}
-                name={firstThread.user.name}
-                image={firstThread.user.image}
-                createdAt={firstThread.createdAt}
-                threadCount={threadCount ?? 0}
-              />
-            )}
+            <ThreadBar
+              count={threadCount ?? 0}
+              image={firstThread?.user.image ?? ''}
+              name={firstThread?.user.name ?? ''}
+              timestamp={firstThread?.createdAt}
+              onClick={() => onOpenMessage(id)}
+            />
           </div>
         )}
       </div>
