@@ -1,6 +1,5 @@
-import { Skeleton } from '@/components/justd/ui'
+import { Separator, Skeleton } from '@/components/justd/ui'
 import { IconMail } from 'justd-icons'
-import { Separator } from 'react-aria-components'
 
 export const ProfileLoading = () => {
   return (
