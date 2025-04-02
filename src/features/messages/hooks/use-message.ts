@@ -23,7 +23,7 @@ export const useMessage = (
 
   const queryClient = useQueryClient()
 
-  const { parentMessageId, onOpenMessage, onClose } = usePanel()
+  const { parentMessageId, onOpenMessage, onOpenProfile, onClose } = usePanel()
 
   const [editMessageId, setEditMessageId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -187,6 +187,7 @@ export const useMessage = (
     isPending,
     isDeletionPending,
     onOpenMessage,
+    onOpenProfile,
     handleUpdate,
     handleDelete,
     toggleReaction,

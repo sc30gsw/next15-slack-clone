@@ -85,6 +85,7 @@ export const VirtuosoThreads = ({ userId, variant }: VirtuosoThreadsProps) => {
                   createdAt={thread.createdAt}
                   isUpdated={thread.isUpdated}
                   isAuthor={thread.userId === userId}
+                  authorId={thread.userId}
                   authorName={thread.user.name}
                   authorImage={thread.user.image}
                   isCompact={isCompact}

@@ -34,6 +34,7 @@ type MessageProps = Pick<
   threadCount?: number
   isCompact?: boolean
   hideThreadButton?: boolean
+  authorId: MessageUser['id']
   authorImage: MessageUser['image']
   authorName: MessageUser['name']
   userId?: string
@@ -53,6 +54,7 @@ export const Message = ({
   isAuthor,
   isCompact,
   hideThreadButton,
+  authorId,
   authorImage,
   authorName,
   userId,
@@ -66,6 +68,7 @@ export const Message = ({
     isPending,
     isDeletionPending,
     onOpenMessage,
+    onOpenProfile,
     handleUpdate,
     handleDelete,
     toggleReaction,
@@ -102,6 +105,7 @@ export const Message = ({
               <div className="text-sm">
                 <button
                   type="button"
+                  onClick={() => onOpenProfile(authorId)}
                   className="font-bold text-black hover:underline cursor-pointer"
                 >
                   {authorName}
@@ -183,7 +187,11 @@ export const Message = ({
       )}
     >
       <div className="flex items-start gap-2">
-        <button type="button" className="cursor-pointer">
+        <button
+          type="button"
+          onClick={() => onOpenProfile(authorId)}
+          className="cursor-pointer"
+        >
           <Avatar
             alt={authorName ?? 'Member'}
             shape="square"
@@ -208,6 +216,7 @@ export const Message = ({
             <div className="text-sm">
               <button
                 type="button"
+                onClick={() => onOpenProfile(authorId)}
                 className="font-bold text-black hover:underline cursor-pointer"
               >
                 {authorName}
