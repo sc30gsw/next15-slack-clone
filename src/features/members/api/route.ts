@@ -39,5 +39,19 @@ const app = new Hono()
 
     return c.json({ members: workspaceMembers }, 200)
   })
+  .get('/member/:memberId', sessionMiddleware, async (c) => {
+    const member = await db.query.members.findFirst({
+      where: eq(members.userId, c.req.param('memberId')),
+      with: {
+        user: true,
+      },
+    })
+
+    if (!member) {
+      return c.json({ member: null }, 200)
+    }
+
+    return c.json({ member }, 200)
+  })
 
 export default app
