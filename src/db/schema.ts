@@ -197,12 +197,8 @@ export const messages = sqliteTable(
     channelId: text('channelId').references(() => channels.id, {
       onDelete: 'cascade',
     }),
-    userId: text('userId')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    workspaceId: text('workspaceId')
-      .notNull()
-      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    userId: text('userId').notNull(),
+    workspaceId: text('workspaceId').notNull(),
     parentMessageId: text('parentMessageId').references(
       (): AnySQLiteColumn => messages.id,
       {
@@ -228,6 +224,16 @@ export const messages = sqliteTable(
       message.parentMessageId,
       message.conversationId,
     ),
+    foreignKey({
+      columns: [message.userId, message.workspaceId],
+      foreignColumns: [members.userId, members.workspaceId],
+      name: 'fk_messages_user_workspace',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [message.workspaceId],
+      foreignColumns: [workspaces.id],
+      name: 'fk_messages_workspace',
+    }).onDelete('cascade'),
   ],
 )
 
@@ -275,7 +281,9 @@ export const conversations = sqliteTable(
     workspaceId: text('workspaceId')
       .notNull()
       .references(() => workspaces.id, { onDelete: 'cascade' }),
+    // memberOne is the current user
     memberOneId: text('memberOneId').notNull(),
+    // memberTwo is the other user
     memberTwoId: text('memberTwoId').notNull(),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     updateAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
