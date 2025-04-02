@@ -1,6 +1,6 @@
 'use client'
 import { ResizableHandle } from '@/components/ui/resizable'
-import { usePanel } from '@/features/messages/hooks/use-panel'
+import { usePanel } from '@/hooks/use-panel'
 import type { ReactNode } from 'react'
 import { Panel, PanelGroup } from 'react-resizable-panels'
 
