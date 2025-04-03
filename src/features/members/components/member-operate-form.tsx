@@ -206,10 +206,10 @@ export const MemberOperateForm = ({
               {getCollectionProps(fields.role, {
                 type: 'radio',
                 options: ['admin', 'member'],
-              }).map((props) => (
-                <Menu.Item key={crypto.randomUUID()}>
-                  <Radio {...props} isDisabled={isPending}>
-                    {props.value}
+              }).map(({ key, ...rest }) => (
+                <Menu.Item key={rest.value}>
+                  <Radio {...rest} isDisabled={isPending}>
+                    {rest.value}
                   </Radio>
                 </Menu.Item>
               ))}

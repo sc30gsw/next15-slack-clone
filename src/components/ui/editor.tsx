@@ -6,6 +6,7 @@ import {} from '@/features/messages/types/schemas/create-message-input-schema'
 import { cn } from '@/utils/classes'
 import {} from '@conform-to/zod'
 import { IconLetterCase, IconMoodSmile, IconPhoto } from '@tabler/icons-react'
+import type { EmojiClickData } from 'emoji-picker-react'
 import { IconSend2, IconX } from 'justd-icons'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -164,13 +165,10 @@ export const Editor = ({
     }
   }
 
-  const onEmojiSelect = (
-    emoji: Record<'id' | 'name' | 'native' | 'shortcodes' | 'unified', string> &
-      Record<'keywords', string[]>,
-  ) => {
+  const onEmojiSelect = (data: EmojiClickData) => {
     const quill = quillRef.current
 
-    quill?.insertText(quill?.getSelection()?.index ?? 0, emoji.native)
+    quill?.insertText(quill?.getSelection()?.index ?? 0, data.emoji)
   }
 
   const isEmpty = !image && text.replace(/<(.|\n)*?>/g, '').trim().length === 0

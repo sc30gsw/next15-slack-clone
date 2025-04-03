@@ -29,7 +29,7 @@ export const MessageToolbar = ({
         <EmojiPopover
           hint="Add reaction"
           disabled={isPending}
-          onEmojiSelect={(emoji) => handleReaction(emoji.native)}
+          onEmojiSelect={(data) => handleReaction(data.emoji)}
         >
           <div className="bg-transparent hover:bg-neutral-300/60 outline-none border-none font-semibold text-lg w-auto p-1.5 overflow-hidden data-hovered:bg-neutral-300/60 data-pressed:bg-neutral-300/60 shrink-0 rounded-md cursor-pointer">
             <IconMoodSmile className="size-4" stroke={2} />
