@@ -3,7 +3,7 @@ import { ProfileContentContainer } from '@/features/members/components/profile-c
 import { ProfileLoading } from '@/features/members/components/profile-loading'
 import { Suspense } from 'react'
 
-export const Profile = () => {
+export const Profile = ({ workspaceId }: Record<'workspaceId', string>) => {
   return (
     <div className="h-full flex flex-col">
       <div className="h-12.25 flex justify-between items-center px-4 border-b">
@@ -11,7 +11,7 @@ export const Profile = () => {
         <PanelCloseButton />
       </div>
       <Suspense fallback={<ProfileLoading />}>
-        <ProfileContentContainer />
+        <ProfileContentContainer workspaceId={workspaceId} />
       </Suspense>
     </div>
   )
