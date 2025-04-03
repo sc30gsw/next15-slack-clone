@@ -1,6 +1,5 @@
 import { Popover, Tooltip } from '@/components/justd/ui'
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import EmojiPicker, { Theme, type EmojiClickData } from 'emoji-picker-react'
 import { useTheme } from 'next-themes'
 import { type ComponentProps, type ReactNode, useRef, useState } from 'react'
 
@@ -9,10 +8,7 @@ type EmojiPopoverProps = {
   disabled?: boolean
   placement?: ComponentProps<typeof Popover.Content>['placement']
   hint?: string
-  onEmojiSelect: (
-    emoji: Record<'id' | 'name' | 'native' | 'shortcodes' | 'unified', string> &
-      Record<'keywords', string[]>,
-  ) => void
+  onEmojiSelect: (emoji: EmojiClickData) => void
 }
 
 export const EmojiPopover = ({
@@ -28,10 +24,7 @@ export const EmojiPopover = ({
   const triggerRef = useRef(null)
   const { theme } = useTheme()
 
-  const onSelect = (
-    emoji: Record<'id' | 'name' | 'native' | 'shortcodes' | 'unified', string> &
-      Record<'keywords', string[]>,
-  ) => {
+  const onSelect = (emoji: EmojiClickData) => {
     onEmojiSelect(emoji)
     setPopoverOpen(false)
 
@@ -62,16 +55,9 @@ export const EmojiPopover = ({
         placement={placement}
         className="p-0 border-none shadow-none"
       >
-        <Picker
-          data={data}
-          theme={theme}
-          onEmojiSelect={(
-            emoji: Record<
-              'id' | 'name' | 'native' | 'shortcodes' | 'unified',
-              string
-            > &
-              Record<'keywords', string[]>,
-          ) => onSelect(emoji)}
+        <EmojiPicker
+          theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT}
+          onEmojiClick={(emoji) => onSelect(emoji)}
         />
       </Popover.Content>
     </>
