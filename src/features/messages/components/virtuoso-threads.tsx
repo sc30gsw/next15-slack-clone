@@ -1,8 +1,8 @@
 import { LoadMoreButton } from '@/features/messages/components/load-more-button'
 import { Message } from '@/features/messages/components/message'
 import { MessageListLoader } from '@/features/messages/components/message-list-loader'
-import { usePanel } from '@/features/messages/hooks/use-panel'
 import { useThreads } from '@/features/messages/hooks/use-threads'
+import { usePanel } from '@/hooks/use-panel'
 import { formatDateLabel } from '@/lib/date'
 import { compareDesc, differenceInMinutes, format } from 'date-fns'
 import { Virtuoso } from 'react-virtuoso'
@@ -85,6 +85,7 @@ export const VirtuosoThreads = ({ userId, variant }: VirtuosoThreadsProps) => {
                   createdAt={thread.createdAt}
                   isUpdated={thread.isUpdated}
                   isAuthor={thread.userId === userId}
+                  authorId={thread.userId}
                   authorName={thread.user.name}
                   authorImage={thread.user.image}
                   isCompact={isCompact}

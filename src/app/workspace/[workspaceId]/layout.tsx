@@ -1,6 +1,6 @@
 'use client'
 import { ResizableHandle } from '@/components/ui/resizable'
-import { usePanel } from '@/features/messages/hooks/use-panel'
+import { usePanel } from '@/hooks/use-panel'
 import type { ReactNode } from 'react'
 import { Panel, PanelGroup } from 'react-resizable-panels'
 
@@ -10,16 +10,18 @@ const WorkspaceIdLayout = ({
   sidebar,
   workspaceSidebar,
   thread,
+  profile,
 }: {
   children: ReactNode
   toolbar: ReactNode
   sidebar: ReactNode
   workspaceSidebar: ReactNode
   thread: ReactNode
+  profile: ReactNode
 }) => {
-  const { parentMessageId } = usePanel()
+  const { parentMessageId, profileMemberId } = usePanel()
 
-  const showPanel = !!parentMessageId
+  const showPanel = !!parentMessageId || !!profileMemberId
 
   return (
     <div className="h-full">
@@ -36,7 +38,7 @@ const WorkspaceIdLayout = ({
             <>
               <ResizableHandle withHandle={true} />
               <Panel minSize={20} defaultSize={29}>
-                {thread}
+                {parentMessageId ? thread : profileMemberId ? profile : null}
               </Panel>
             </>
           )}

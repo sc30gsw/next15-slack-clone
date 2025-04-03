@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, use } from 'react'
+import { type ComponentProps, createContext, use } from 'react'
 
 import { IconBulletFill, IconCheck, IconChevronLgRight } from 'justd-icons'
 import type {
@@ -12,7 +12,7 @@ import type {
   PopoverProps,
 } from 'react-aria-components'
 import {
-  Button,
+  Button as ButtonFromRa,
   Collection,
   Header,
   MenuItem as MenuItemPrimitive,
@@ -25,6 +25,7 @@ import {
 import type { VariantProps } from 'tailwind-variants'
 import { tv } from 'tailwind-variants'
 
+import { Button } from '@/components/justd/ui/button'
 import {
   DropdownItemDetails,
   DropdownKeyboard,
@@ -78,7 +79,7 @@ interface MenuTriggerProps extends ButtonProps {
 }
 
 const MenuTrigger = ({ className, ref, ...props }: MenuTriggerProps) => (
-  <Button
+  <ButtonFromRa
     ref={ref}
     data-slot="menu-trigger"
     className={trigger({ className })}
@@ -91,7 +92,7 @@ const MenuTrigger = ({ className, ref, ...props }: MenuTriggerProps) => (
           : props.children}
       </>
     )}
-  </Button>
+  </ButtonFromRa>
 )
 
 interface MenuContentProps<T>
@@ -251,6 +252,28 @@ const MenuSection = <T extends object>({
   )
 }
 
+interface MenuTriggerProps extends ComponentProps<typeof Button> {
+  className?: string
+  ref?: React.Ref<HTMLButtonElement>
+}
+
+const CustomMenuTrigger = ({ className, ref, ...props }: MenuTriggerProps) => (
+  <Button
+    ref={ref}
+    data-slot="menu-trigger"
+    className={trigger({ className })}
+    {...props}
+  >
+    {(values) => (
+      <>
+        {typeof props.children === 'function'
+          ? props.children(values)
+          : props.children}
+      </>
+    )}
+  </Button>
+)
+
 const MenuSeparator = DropdownSeparator
 const MenuItemDetails = DropdownItemDetails
 const MenuKeyboard = DropdownKeyboard
@@ -266,6 +289,7 @@ Menu.ItemDetails = MenuItemDetails
 Menu.Label = MenuLabel
 Menu.Trigger = MenuTrigger
 Menu.Submenu = MenuSubMenu
+Menu.CustomTrigger = CustomMenuTrigger
 
 export type {
   MenuProps,

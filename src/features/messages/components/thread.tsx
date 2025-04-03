@@ -1,4 +1,4 @@
-import { ThreadCloseButton } from '@/features/messages/components/thread-close-button'
+import { PanelCloseButton } from '@/components/ui/panel-close-button'
 import { ThreadMessage } from '@/features/messages/components/thread-message'
 import { getSession } from '@/lib/auth/session'
 
@@ -9,7 +9,7 @@ export const Thread = async () => {
     <div className="h-full flex flex-col">
       <div className="h-12.25 flex justify-between items-center px-4 border-b">
         <p className="text-lg font-bold">Thread</p>
-        <ThreadCloseButton />
+        <PanelCloseButton />
       </div>
       <ThreadMessage userId={session?.user?.id} />
     </div>

@@ -5,7 +5,7 @@ import {
   getThreadsCacheKey,
 } from '@/constants/cache-keys'
 import { createMessageAction } from '@/features/messages/actions/create-message-action'
-import { usePanel } from '@/features/messages/hooks/use-panel'
+import { usePanel } from '@/hooks/use-panel'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import type Quill from 'quill'

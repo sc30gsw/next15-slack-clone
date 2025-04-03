@@ -3,7 +3,6 @@ import { ChannelHero } from '@/features/channels/components/channel-hero'
 import { getChannel } from '@/features/channels/server/fetcher'
 import { VirtuosoMessageList } from '@/features/messages/components/virtuoso-message-list'
 import { getSession } from '@/lib/auth/session'
-import {} from '@/lib/date'
 import { Suspense } from 'react'
 
 type MessageListProps = {

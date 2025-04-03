@@ -1,11 +1,12 @@
 'use client'
+
 import { Skeleton } from '@/components/justd/ui'
 import { Message } from '@/features/messages/components/message'
 import { MessageListLoader } from '@/features/messages/components/message-list-loader'
 import { ThreadInput } from '@/features/messages/components/thread-input'
 import { VirtuosoThreads } from '@/features/messages/components/virtuoso-threads'
-import { usePanel } from '@/features/messages/hooks/use-panel'
 import { useThreadMessage } from '@/features/messages/hooks/use-thread-message'
+import { usePanel } from '@/hooks/use-panel'
 import { IconTriangleExclamation } from 'justd-icons'
 import { useParams } from 'next/navigation'
 
@@ -35,16 +36,7 @@ export const ThreadMessage = ({
     )
   }
 
-  if (isError) {
-    return (
-      <div className="flex flex-col gap-y-2 h-full items-center justify-center">
-        <IconTriangleExclamation className="size-5 text-muted-fg" />
-        <p className="text-sm text-muted-fg">Message not found</p>
-      </div>
-    )
-  }
-
-  if (!message) {
+  if (isError || !message) {
     return (
       <div className="flex flex-col gap-y-2 h-full items-center justify-center">
         <IconTriangleExclamation className="size-5 text-muted-fg" />
@@ -63,6 +55,7 @@ export const ThreadMessage = ({
           createdAt={message.createdAt}
           isUpdated={message.isUpdated}
           isAuthor={message.userId === userId}
+          authorId={message.userId}
           authorName={message.user.name}
           authorImage={message.user.image}
           isCompact={false}

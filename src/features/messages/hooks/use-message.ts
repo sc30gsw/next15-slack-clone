@@ -5,10 +5,10 @@ import {
 } from '@/constants/cache-keys'
 import { deleteMessageAction } from '@/features/messages/actions/delete-message-action'
 import { updateMessageAction } from '@/features/messages/actions/update-message-action'
-import { usePanel } from '@/features/messages/hooks/use-panel'
 import { toggleReactionAction } from '@/features/reactions/action/toggle-reaction-action'
 import { reactionRevalidate } from '@/features/reactions/utils/reaction-revalidate'
 import { Confirm } from '@/hooks/use-confirm'
+import { usePanel } from '@/hooks/use-panel'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { useState, useTransition } from 'react'
@@ -23,7 +23,7 @@ export const useMessage = (
 
   const queryClient = useQueryClient()
 
-  const { parentMessageId, onOpenMessage, onClose } = usePanel()
+  const { parentMessageId, onOpenMessage, onOpenProfile, onClose } = usePanel()
 
   const [editMessageId, setEditMessageId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -187,6 +187,7 @@ export const useMessage = (
     isPending,
     isDeletionPending,
     onOpenMessage,
+    onOpenProfile,
     handleUpdate,
     handleDelete,
     toggleReaction,

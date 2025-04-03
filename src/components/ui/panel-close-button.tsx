@@ -1,10 +1,10 @@
 'use client'
 
 import { Button } from '@/components/justd/ui'
-import { usePanel } from '@/features/messages/hooks/use-panel'
+import { usePanel } from '@/hooks/use-panel'
 import { IconX } from 'justd-icons'
 
-export const ThreadCloseButton = () => {
+export const PanelCloseButton = () => {
   const { onClose } = usePanel()
 
   return (

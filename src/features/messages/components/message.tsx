@@ -2,8 +2,8 @@ import { Avatar } from '@/components/justd/ui'
 import { Editor } from '@/components/ui/editor'
 import { Hint } from '@/components/ui/hint'
 import { Renderer } from '@/components/ui/renderer'
-import { FirstThreadButton } from '@/features/messages/components/first-thread-button'
 import { MessageToolbar } from '@/features/messages/components/message-toolbar'
+import { ThreadBar } from '@/features/messages/components/thread-bar'
 import { Thumbnail } from '@/features/messages/components/thumbnail'
 import { useMessage } from '@/features/messages/hooks/use-message'
 import type { MessageResponse } from '@/features/messages/types'
@@ -34,6 +34,7 @@ type MessageProps = Pick<
   threadCount?: number
   isCompact?: boolean
   hideThreadButton?: boolean
+  authorId: MessageUser['id']
   authorImage: MessageUser['image']
   authorName: MessageUser['name']
   userId?: string
@@ -53,6 +54,7 @@ export const Message = ({
   isAuthor,
   isCompact,
   hideThreadButton,
+  authorId,
   authorImage,
   authorName,
   userId,
@@ -66,6 +68,7 @@ export const Message = ({
     isPending,
     isDeletionPending,
     onOpenMessage,
+    onOpenProfile,
     handleUpdate,
     handleDelete,
     toggleReaction,
@@ -102,6 +105,7 @@ export const Message = ({
               <div className="text-sm">
                 <button
                   type="button"
+                  onClick={() => onOpenProfile(authorId)}
                   className="font-bold text-black hover:underline cursor-pointer"
                 >
                   {authorName}
@@ -148,15 +152,13 @@ export const Message = ({
                 isThreadCache={isThreadCache}
                 isConversationCache={isConversationCache}
               />
-              {firstThread && (
-                <FirstThreadButton
-                  id={id}
-                  name={firstThread.user.name}
-                  image={firstThread.user.image}
-                  createdAt={firstThread.createdAt}
-                  threadCount={threadCount ?? 0}
-                />
-              )}
+              <ThreadBar
+                count={threadCount ?? 0}
+                image={firstThread?.user.image ?? ''}
+                name={firstThread?.user.name ?? ''}
+                timestamp={firstThread?.createdAt}
+                onClick={() => onOpenMessage(id)}
+              />
             </div>
           )}
         </div>
@@ -185,7 +187,11 @@ export const Message = ({
       )}
     >
       <div className="flex items-start gap-2">
-        <button type="button" className="cursor-pointer">
+        <button
+          type="button"
+          onClick={() => onOpenProfile(authorId)}
+          className="cursor-pointer"
+        >
           <Avatar
             alt={authorName ?? 'Member'}
             shape="square"
@@ -210,6 +216,7 @@ export const Message = ({
             <div className="text-sm">
               <button
                 type="button"
+                onClick={() => onOpenProfile(authorId)}
                 className="font-bold text-black hover:underline cursor-pointer"
               >
                 {authorName}
@@ -256,16 +263,13 @@ export const Message = ({
               isThreadCache={isThreadCache}
               isConversationCache={isConversationCache}
             />
-
-            {firstThread && (
-              <FirstThreadButton
-                id={id}
-                name={firstThread.user.name}
-                image={firstThread.user.image}
-                createdAt={firstThread.createdAt}
-                threadCount={threadCount ?? 0}
-              />
-            )}
+            <ThreadBar
+              count={threadCount ?? 0}
+              image={firstThread?.user.image ?? ''}
+              name={firstThread?.user.name ?? ''}
+              timestamp={firstThread?.createdAt}
+              onClick={() => onOpenMessage(id)}
+            />
           </div>
         )}
       </div>
