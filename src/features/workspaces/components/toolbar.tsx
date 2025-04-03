@@ -1,4 +1,7 @@
 import { Button, Skeleton } from '@/components/justd/ui'
+import { getChannels } from '@/features/channels/server/fetcher'
+import { getWorkspaceMembers } from '@/features/members/server/fetcher'
+import { SearchMenu } from '@/features/workspaces/components/search-menu'
 import { getWorkspace } from '@/features/workspaces/server/fetcher'
 import { getSession } from '@/lib/auth/session'
 import { IconCircleInfo, IconSearch } from 'justd-icons'
@@ -15,6 +18,17 @@ export const Toolbar = async ({ workspaceId }: ToolbarProps) => {
     userId: session?.user?.id,
   })
 
+  const searchPromise = Promise.all([
+    getChannels({
+      param: { workspaceId },
+      userId: session?.user?.id,
+    }),
+    getWorkspaceMembers({
+      param: { workspaceId },
+      userId: session?.user?.id,
+    }),
+  ])
+
   return (
     <div className="bg-[#481349] flex items-center justify-between h-10 p-1.5">
       <div className="flex-1" />
@@ -23,17 +37,18 @@ export const Toolbar = async ({ workspaceId }: ToolbarProps) => {
           <Skeleton className="min-w-[280px] max-[642px] h-7 grow-[2] shrink bg-zinc-400/40" />
         }
       >
-        <div className="min-w-[280px] max-[642px] grow-[2] shrink">
-          <Button
-            size="small"
-            className="bg-secondary/25 hover:bg-secondary-25 data-hovered:bg-secondary-25 data-pressed:bg-secondary-25 w-full h-7 justify-start px-2"
+        {searchPromise.then(([channels, members]) => (
+          <SearchMenu
+            channels={channels}
+            members={members}
+            workspaceId={workspaceId}
           >
             <IconSearch className="size-4 text-white mr-2" />
             <span className="text-white text-xs">
               Search {workspacePromise.then((workspace) => workspace.name)}
             </span>
-          </Button>
-        </div>
+          </SearchMenu>
+        ))}
       </Suspense>
 
       <div className="ml-auto flex-1 flex items-center justify-end">
