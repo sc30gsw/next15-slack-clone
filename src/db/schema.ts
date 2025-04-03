@@ -346,15 +346,23 @@ export const reactions = sqliteTable(
     messageId: text('messageId').references(() => messages.id, {
       onDelete: 'cascade',
     }),
-    userId: text('userId')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+    userId: text('userId').notNull(),
     value: text('value').notNull(),
   },
   (reaction) => [
     index('reaction_workspaceId').on(reaction.workspaceId),
     index('reaction_messageId').on(reaction.messageId),
     index('reaction_userId').on(reaction.userId),
+    foreignKey({
+      columns: [reaction.userId, reaction.workspaceId],
+      foreignColumns: [members.userId, members.workspaceId],
+      name: 'fk_reactions_user_workspace',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [reaction.workspaceId],
+      foreignColumns: [workspaces.id],
+      name: 'fk_reactions_workspace',
+    }).onDelete('cascade'),
   ],
 )
 
