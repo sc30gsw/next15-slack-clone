@@ -4,15 +4,17 @@ import type { InferRequestType, InferResponseType } from 'hono'
 
 export const getMember = async (
   req: InferRequestType<
-    (typeof client.api.members.member)[':memberId']['$get']
+    (typeof client.api.members)['workspace-member'][':workspaceId'][':memberId']['$get']
   > &
     Partial<Record<'userId', string>>,
 ) => {
-  const url = client.api.members.member[':memberId'].$url({
+  const url = client.api.members['workspace-member'][':workspaceId'][
+    ':memberId'
+  ].$url({
     param: req.param,
   })
   type ResType = InferResponseType<
-    (typeof client.api.members.member)[':memberId']['$get'],
+    (typeof client.api.members)['workspace-member'][':workspaceId'][':memberId']['$get'],
     200
   >
 

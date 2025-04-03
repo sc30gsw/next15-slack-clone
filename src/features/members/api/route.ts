@@ -39,19 +39,28 @@ const app = new Hono()
 
     return c.json({ members: workspaceMembers }, 200)
   })
-  .get('/member/:memberId', sessionMiddleware, async (c) => {
-    const member = await db.query.members.findFirst({
-      where: eq(members.userId, c.req.param('memberId')),
-      with: {
-        user: true,
-      },
-    })
+  .get(
+    '/workspace-member/:workspaceId/:memberId',
+    sessionMiddleware,
+    async (c) => {
+      const { workspaceId, memberId } = c.req.param()
 
-    if (!member) {
-      return c.json({ member: null }, 200)
-    }
+      const member = await db.query.members.findFirst({
+        where: and(
+          eq(members.workspaceId, workspaceId),
+          eq(members.userId, memberId),
+        ),
+        with: {
+          user: true,
+        },
+      })
 
-    return c.json({ member }, 200)
-  })
+      if (!member) {
+        return c.json({ member: null }, 200)
+      }
+
+      return c.json({ member }, 200)
+    },
+  )
 
 export default app
