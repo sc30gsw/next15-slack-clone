@@ -32,9 +32,14 @@ export const joinAction = async (workspaceId: string, joinCode: string) => {
     } as const satisfies SubmissionResult
   }
 
-  // if (workspace.joinCode !== joinCode) {
-  //   unauthorized()
-  // }
+  if (workspace.joinCode.toUpperCase() !== joinCode.toUpperCase()) {
+    return {
+      status: 'error',
+      error: {
+        message: ['unauthorized'],
+      },
+    } as const satisfies SubmissionResult
+  }
 
   const existMember = await db.query.members.findFirst({
     where: and(
@@ -56,5 +61,10 @@ export const joinAction = async (workspaceId: string, joinCode: string) => {
   revalidateTag(`${getWorkspacesCacheKey}/${workspaceId}`)
   revalidateTag(`${getWorkspaceInfoCacheKey}/${workspaceId}`)
 
-  return workspaceId
+  return {
+    status: 'success',
+    initialValue: {
+      workspaceId,
+    },
+  } as const satisfies SubmissionResult
 }

@@ -15,13 +15,14 @@ export const JoinVerificationInput = () => {
 
   const handleComplete = (value: string) => {
     startTransition(async () => {
-      try {
-        await joinAction(params.workspaceId, value)
-        toast.success('Joined workspace')
-        router.replace(`/workspace/${params.workspaceId}`)
-      } catch (_) {
-        toast.error('Failed to join workspace')
+      const result = await joinAction(params.workspaceId, value)
+
+      if (result.status === 'error') {
+        toast.error(result.error.message[0])
+        return
       }
+      toast.success('Joined workspace')
+      router.replace(`/workspace/${params.workspaceId}`)
     })
   }
 
