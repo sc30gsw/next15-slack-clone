@@ -26,7 +26,7 @@ const MemberIdPage = async ({
   return (
     <div className="flex flex-col h-full">
       <div className="bg-white border-b h-12.25 flex items-center px-4 overflow-hidden">
-        <ConversationHeader>
+        <ConversationHeader memberId={memberId}>
           <Suspense
             fallback={
               <div className="flex items-center gap-x-2">
